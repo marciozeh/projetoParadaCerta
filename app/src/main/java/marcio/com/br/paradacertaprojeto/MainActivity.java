@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             inputStream.close();
             */
 
-
+            /*
             //tabeta das linhas
             AssetManager assetManager = getResources().getAssets();
             InputStream inputStream = assetManager.open("newlinhas.csv");
@@ -196,6 +196,72 @@ public class MainActivity extends AppCompatActivity {
 
             }
             inputStream.close();
+            */
+
+            //tabeta das paradalinha
+            AssetManager assetManager = getResources().getAssets();
+            InputStream inputStream = assetManager.open("newparadalinha.csv");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            String paradalinha;
+            LinkedList<String> paradalinhas = new LinkedList<String>();
+
+            // banco abrir
+            SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+
+            bancoDados.execSQL("CREATE TABLE IF NOT EXISTS paradalinha (idlinha INT(5), idparada INT(5))");
+
+            String tabela ="paradalinha";
+            String colunas ="idlinha, idparada";
+            String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
+            String str2 = ");";
+
+            while((paradalinha = bufferedReader.readLine())!=null){
+                //Imprime linha
+                //Log.i("Print: ", paradas);
+
+                StringBuilder sb = new StringBuilder(str1);
+                String[] str = paradalinha.split(";");
+                sb.append(str[0] +"," );
+                sb.append(str[1]);
+                sb.append(str2);
+
+                bancoDados.execSQL(sb.toString());
+                //Imprime linha
+                //Log.i("Append: ", sb.toString());
+
+            }
+            inputStream.close();
+
+
+
+            /*
+            //Exibir o conteudo do banco
+            AssetManager assetManager = getResources().getAssets();
+            InputStream inputStream = assetManager.open("newparadalinha.csv");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+
+            SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM paradalinha", null);
+
+            int indiceColuneId = cursor.getColumnIndex("idparada");
+            int indiceColuneLinha = cursor.getColumnIndex("idlinha");
+
+
+            cursor.moveToFirst();
+
+            while (cursor != null) {
+
+                Log.i("Resultado - idparada: ", cursor.getString(indiceColuneId));
+                Log.i("Resultado - linha: ", cursor.getString(indiceColuneLinha));
+
+                cursor.moveToNext();
+            }*/
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
