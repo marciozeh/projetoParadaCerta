@@ -22,20 +22,20 @@ public class MainActivity extends AppCompatActivity {
 
 
         try {
-
+            /*
             //tabela de coordenadas
 
             AssetManager assetManager = getResources().getAssets();
             InputStream inputStream = assetManager.open("coordenadas.csv");
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String linha;
-            LinkedList<String> linhas = new LinkedList<String>();
+            String coordenada;
+            LinkedList<String> coordenadas = new LinkedList<String>();
 
 
             // banco abrir
             SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-            /*Inserir tabela de coordenadas
+            Inserir tabela de coordenadas
             bancoDados.execSQL("CREATE TABLE IF NOT EXISTS coordenadas (idcoordenada INT(10), latitude DOUBLE(20), longitude DOUBLE(20), idlinha INT(5))");
 
             String tabela ="coordenadas";
@@ -43,12 +43,12 @@ public class MainActivity extends AppCompatActivity {
             String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
             String str2 = ");";
 
-            while((linha = bufferedReader.readLine())!=null){
+            while((coordenada = bufferedReader.readLine())!=null){
                 //Imprime linha
-                //Log.i("Print: ", linha);
+                //Log.i("Print: ", coordenada);
 
                 StringBuilder sb = new StringBuilder(str1);
-                String[] str = linha.split(";");
+                String[] str = coordenada.split(";");
                 sb.append(str[0] +"," );
                 sb.append(str[1] +"," );
                 sb.append(str[2] +"," );
@@ -79,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Resultado - longitude: ", cursor.getString(indiceColunelongitude));
                 Log.i("Resultado - idlinha: ", cursor.getString(indiceColunelatitude));
                 cursor.moveToNext();
-            }*/
+            }
+            inputStream.close();
+            */
 
 
 
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 //Log.i("Append: ", sb.toString());
             }
 
-*/
+            */
 
 
             //Mensagem de concluído com sucesso.
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
             String texto = "concluido";
             //Log.i("Concluído: ", texto);
 
-/*
+            /*
             //Exibir o conteudo do banco
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM paradas", null);
 
@@ -152,8 +154,47 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Resultado - terminal: ", cursor.getString(indiceColuneterminal));
                 cursor.moveToNext();
             }
+
+            inputStream.close();
             */
 
+
+            //tabeta das linhas
+            AssetManager assetManager = getResources().getAssets();
+            InputStream inputStream = assetManager.open("newlinhas.csv");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            String linha;
+            LinkedList<String> linhas = new LinkedList<String>();
+
+            // banco abrir
+            SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+
+            bancoDados.execSQL("CREATE TABLE IF NOT EXISTS linhas (idlinha INT(5), nome VARCHAR (50), codigo VARCHAR(10), tipo VARCHAR(5))");
+
+            String tabela ="linhas";
+            String colunas ="idlinha, nome, codigo, tipo";
+            String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
+            String str2 = ");";
+
+            while((linha = bufferedReader.readLine())!=null){
+                //Imprime linha
+                //Log.i("Print: ", paradas);
+
+                StringBuilder sb = new StringBuilder(str1);
+                String[] str = linha.split(";");
+                sb.append(str[0] +"," );
+                sb.append("'" + str[1] +"',");
+                sb.append("'" + str[2] +"'," );
+                sb.append("'" + str[3] +"'" );
+                sb.append(str2);
+
+                bancoDados.execSQL(sb.toString());
+                //Imprime linha
+                //Log.i("Append: ", sb.toString());
+
+            }
             inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
