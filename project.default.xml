@@ -32,9 +32,9 @@
       </component>
       <component name="ProjectRootManager" version="2" languageLevel="JDK_1_3" default="true" assert-keyword="false" jdk-15="false" />
       <component name="PropertiesComponent">
-        <property name="settings.editor.selected.configurable" value="android.sdk-updates" />
+        <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/sdk" />
+        <property name="settings.editor.selected.configurable" value="preferences.pathVariables" />
         <property name="settings.editor.splitter.proportion" value="0.2" />
-        <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
       </component>
       <component name="RunManager">
         <configuration default="true" type="Application" factoryName="Application">
@@ -121,22 +121,6 @@
         <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
           <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
         </configuration>
-      </component>
-      <component name="masterDetails">
-        <states>
-          <state key="ProjectJDKs.UI">
-            <settings>
-              <last-edited>1.8</last-edited>
-              <splitter-proportions>
-                <option name="proportions">
-                  <list>
-                    <option value="0.2" />
-                  </list>
-                </option>
-              </splitter-proportions>
-            </settings>
-          </state>
-        </states>
       </component>
     </defaultProject>
   </component>
