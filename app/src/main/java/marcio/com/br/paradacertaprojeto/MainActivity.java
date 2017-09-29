@@ -1,27 +1,58 @@
 package marcio.com.br.paradacertaprojeto;
 
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-import java.io.BufferedReader;
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+
+    static ArrayList<String> linhas;
+    static ArrayAdapter arrayAdapter;
+    static ArrayList<LatLng> localizacoes;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ListView listView = (ListView) findViewById(R.id.listview);
+        linhas = new ArrayList<>();
+        linhas.add("Selecione uma linha.");
+
+        localizacoes = new ArrayList<>();
+        localizacoes.add(new LatLng(0, 0));
+
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, linhas);
+        listView.setAdapter(arrayAdapter);
+
+        /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(),MapsActivity.class);
+                startActivity(intent);
+            }
+        })*/;
+
 
         try {
+            AssetManager assetManager = getResources().getAssets();
+            InputStream inputStream = assetManager.open("coordenadas.csv");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             /*
             //tabela de coordenadas
 
@@ -197,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
             }
             inputStream.close();
             */
-
+            /*
             //tabeta das paradalinha
             AssetManager assetManager = getResources().getAssets();
             InputStream inputStream = assetManager.open("newparadalinha.csv");
@@ -210,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             // banco abrir
             SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
 
-            bancoDados.execSQL("CREATE TABLE IF NOT EXISTS paradalinha (idlinha INT(5), idparada INT(5))");
+            /*bancoDados.execSQL("CREATE TABLE IF NOT EXISTS paradalinha (idlinha INT(5), idparada INT(5))");
 
             String tabela ="paradalinha";
             String colunas ="idlinha, idparada";
@@ -233,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
             inputStream.close();
-
+            */
 
 
             /*
@@ -264,6 +295,34 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        for (int result : grantResults){
+            if(result == PackageManager.PERMISSION_DENIED){
+                //permissao negada
+                alertAndFinish();
+                return;
+            }
+        }
+
+    }
+
+    private void alertAndFinish() {
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.app_name).setMessage("É necessário aceitar as permissões");
+
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int id){
+                    finish();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
     }
 }
