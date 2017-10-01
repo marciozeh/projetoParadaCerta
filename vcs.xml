@@ -10,8 +10,12 @@
           <option name="url" value="https://github.com/joaofolle/parada-certa.git" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://github.com/marciozeh/projetoParadaCerta.git" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
-    <option name="cloneParentDir" value="C:\Users\ogust\Documents\IFRS\DEV2" />
+    <option name="cloneParentDir" value="C:\Users\Informatica\Desktop\teste" />
   </component>
 </application>
