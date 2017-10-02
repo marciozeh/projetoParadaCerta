@@ -1,13 +1,15 @@
 package marcio.com.br.paradacertaprojeto;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     static ArrayList<String> linhas;
     static ArrayAdapter arrayAdapter;
+
     static ArrayList<LatLng> localizacoes;
 
     private ListView listaLinhas;
@@ -27,10 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> codigo;
     private ArrayList<String> nome;
 
-
     SQLiteDatabase bancoDados;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,40 +38,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         listaLinhas = (ListView) findViewById(R.id.listviewid);
-
         carregaLinhas();
 
+
     }
 
-        private void carregaParadas(){
-            try{
-                bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
 
-                Cursor cursor = bancoDados.rawQuery("SELECT FROM coordenadas where =",null);
-                cursor.moveToFirst();
-                while(cursor!=null){
+    //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
+    private void carregaLinhas() {
 
-                    int indiceColunaLatitude = cursor.getColumnIndex("latitude");
-                    int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-
-
-
-                    Log.i("LogX","latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " +cursor.getString(indiceColunaLongitude));
-                    cursor.moveToNext();
-                }
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-    }
-
-        //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
-        private void carregaLinhas(){
-
-        try{
+        try {
             bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
 
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM linhas",null);
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM linhas", null);
 
             int indiceColunaCodigo = cursor.getColumnIndex("codigo");
             int indiceColunaNome = cursor.getColumnIndex("nome");
@@ -85,11 +64,23 @@ public class MainActivity extends AppCompatActivity {
                     android.R.id.text1,
                     nome);
 
-            listaLinhas .setAdapter(itensAdaptador);
+            listaLinhas.setAdapter(itensAdaptador);
+
+            linhas = new ArrayList<>();
+            linhas.add("linha");
+            
+            listaLinhas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                    startActivity(intent);
+                }
+            });
 
 
             cursor.moveToFirst();
-            while(cursor!=null){
+            while (cursor != null) {
 
                 codigo.add(cursor.getString(indiceColunaCodigo));
                 nome.add(cursor.getString(indiceColunaNome));
@@ -97,12 +88,33 @@ public class MainActivity extends AppCompatActivity {
                 cursor.moveToNext();
             }
 
-        }catch (Exception e){
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // carregará o mapa com as paradas carregadas.
+    private void carregaParadas() {
+        try {
+            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
 
+            Cursor cursor = bancoDados.rawQuery("SELECT FROM coordenadas where =", null);
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+
+
+                //Log.i("LogX","latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " +cursor.getString(indiceColunaLongitude));
+                cursor.moveToNext();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
         /*
         try{
@@ -150,18 +162,7 @@ public class MainActivity extends AppCompatActivity {
         */
 
 
-
-
-
-
-
-
-
-
-
-
-
-        //Contrução do banco de dados, é aberta as tabelas e importadas para o banco, sendo feitas uma a uma.
+    //Contrução do banco de dados, é aberta as tabelas e importadas para o banco, sendo feitas uma a uma.
         /*
         try {
             AssetManager assetManager = getResources().getAssets();
@@ -273,9 +274,9 @@ public class MainActivity extends AppCompatActivity {
             */
 
 
-            //Mensagem de concluído com sucesso.
+    //Mensagem de concluído com sucesso.
 
-            //Log.i("Concluído: ", texto);
+    //Log.i("Concluído: ", texto);
 
             /*
             //Exibir o conteudo do banco
@@ -373,11 +374,11 @@ public class MainActivity extends AppCompatActivity {
         }*/
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        for (int result : grantResults){
-            if(result == PackageManager.PERMISSION_DENIED){
+        for (int result : grantResults) {
+            if (result == PackageManager.PERMISSION_DENIED) {
                 //permissao negada
                 alertAndFinish();
                 return;
@@ -391,8 +392,8 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.app_name).setMessage("É necessário aceitar as permissões");
 
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int id){
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
                     finish();
                 }
             });
