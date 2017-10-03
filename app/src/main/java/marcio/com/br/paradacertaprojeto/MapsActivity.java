@@ -1,18 +1,20 @@
 package marcio.com.br.paradacertaprojeto;
 
-import android.support.v4.app.FragmentActivity;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+
+    int localizacao = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +39,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        SQLiteDatabase bancoDados;
 
+        try {
+            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+
+
+            String teste = MainActivity.linhaid;
+            Log.i("no maps", teste);
+
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha =" + MainActivity.linhaid, null);
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+
+
+                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                cursor.moveToNext();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        /*
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        */
     }
 }
