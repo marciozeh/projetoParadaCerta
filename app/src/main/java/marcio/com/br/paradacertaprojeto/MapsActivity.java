@@ -4,11 +4,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -24,6 +25,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
     }
 
 
@@ -45,18 +47,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
 
 
-            String teste = MainActivity.linhaid;
-            Log.i("no maps", teste);
+            Bundle bundle = getIntent().getExtras();
+            String idLinha = bundle.getString("idLinha");
 
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha =" + MainActivity.linhaid, null);
+
+
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha =" + idLinha, null);
+
+            int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+            int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+
+
             cursor.moveToFirst();
             while (cursor != null) {
 
-                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
-                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+                double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
+                double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
 
 
-                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                LatLng sydney = new LatLng(latitude, longitude);
+                mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+
+                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
                 cursor.moveToNext();
             }
 

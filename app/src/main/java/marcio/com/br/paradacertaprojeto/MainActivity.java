@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                    intent.putExtra("idLinha",linhaid);
                     startActivity(intent);
                 }
             });
