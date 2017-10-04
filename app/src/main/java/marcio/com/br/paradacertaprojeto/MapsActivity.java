@@ -66,9 +66,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
 
 
-                LatLng sydney = new LatLng(latitude, longitude);
-                mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                LatLng parada = new LatLng(latitude, longitude);
+                mMap.addMarker(new MarkerOptions().position(parada).title("Marker in Sydney"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
 
                 //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
                 cursor.moveToNext();

@@ -1,10 +1,13 @@
 package marcio.com.br.paradacertaprojeto;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> codigo;
     private ArrayList<String> nome;
     private ArrayList<String> idlinha;
-
+    private ArrayList<String> resultado;
 
     //problema com a permissão, não funcinou comforme o tutorial
 
@@ -68,11 +71,19 @@ public class MainActivity extends AppCompatActivity {
             codigo = new ArrayList<String>();
             nome = new ArrayList<String>();
             idlinha = new ArrayList<String>();
+            resultado = new ArrayList<String>();
+
+
+
+
+
 
             itensAdaptador = new ArrayAdapter<String>(getApplicationContext(),
                     android.R.layout.simple_list_item_1,
                     android.R.id.text1,
-                    nome);
+                    resultado);
+
+
 
             listaLinhas.setAdapter(itensAdaptador);
 
@@ -90,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                    intent.putExtra("idLinha",linhaid);
+                    intent.putExtra("idLinha", linhaid);
                     startActivity(intent);
                 }
             });
@@ -102,6 +113,8 @@ public class MainActivity extends AppCompatActivity {
                 codigo.add(cursor.getString(indiceColunaCodigo));
                 nome.add(cursor.getString(indiceColunaNome));
                 idlinha.add(cursor.getString(indiceColunaId));
+                resultado.add(cursor.getString(indiceColunaCodigo)+" "+cursor.getString(indiceColunaNome));
+
                 //Log.i("LogX","Código: " + cursor.getString(indiceColunaCodigo) + " Linha: " +cursor.getString(indiceColunaNome));
                 cursor.moveToNext();
             }
@@ -181,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
         */
 
 
-        //tabeta das paradas
+    //tabeta das paradas
 /*
         try {
 
@@ -384,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }*/
 
-/*
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -411,7 +424,8 @@ public class MainActivity extends AppCompatActivity {
             });
             AlertDialog dialog = builder.create();
             dialog.show();
-        }*/
+        }
 
 
+    }
 }
