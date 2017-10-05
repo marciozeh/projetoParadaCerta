@@ -11,12 +11,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-
-    int localizacao = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,33 +57,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             int indiceColunaLatitude = cursor.getColumnIndex("latitude");
             int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+            int indiceColunaIdCoordenada = cursor.getColumnIndex("idcoordenada");
 
+            PolylineOptions lineOptions = null;
 
+            lineOptions = new PolylineOptions();
             cursor.moveToFirst();
             while (cursor != null) {
 
                 double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                 double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+                String idcoordenada =cursor.getString(indiceColunaIdCoordenada);
 
 
+
+                        lineOptions.add(new LatLng(latitude, longitude));
+                        Polyline polyline1 = mMap.addPolyline(lineOptions);
                 LatLng parada = new LatLng(latitude, longitude);
-                mMap.addMarker(new MarkerOptions().position(parada).title("Marker in Sydney"));
+                mMap.addMarker(new MarkerOptions().position(parada).title(idcoordenada));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
+                mMap.getUiSettings().setZoomControlsEnabled(true);
+                float zoomnivel = 14.0f;
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada,zoomnivel));
 
                 //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
                 cursor.moveToNext();
+
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
-        /*
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        */
+       
     }
 }
