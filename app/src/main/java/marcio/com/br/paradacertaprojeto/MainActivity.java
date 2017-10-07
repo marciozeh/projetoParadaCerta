@@ -16,6 +16,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+
+import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,8 +59,12 @@ public class MainActivity extends AppCompatActivity {
         listaLinhas = (ListView) findViewById(R.id.listviewid);
         carregaLinhas();
 
+        if (AccessToken.getCurrentAccessToken() == null) {
+            goLoginScreen();
+        }
 
     }
+
 
 
     //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
@@ -427,5 +438,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    private void goLoginScreen() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    public void logout(View view) {
+        LoginManager.getInstance().logOut();
+        goLoginScreen();
     }
 }
