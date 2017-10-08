@@ -38,8 +38,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthProvider;
-=======
->>>>>>> parent of 1092c59... botoes de zoom
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,12 +47,11 @@ public class MainActivity extends AppCompatActivity {
     static ArrayAdapter arrayAdapter;
     public static String linhaid;
 
-<<<<<<< HEAD
+
     private LoginButton loginButton;
     private FirebaseAuth fireBaseAuth;
     private CallbackManager callbackManager;
-=======
->>>>>>> parent of 1092c59... botoes de zoom
+
 
     private ListView listaLinhas;
     private ArrayAdapter<String> itensAdaptador;
