@@ -4,10 +4,10 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,11 +16,27 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Toast;
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthProvider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<String> linhas;
     static ArrayAdapter arrayAdapter;
     public static String linhaid;
+
+    private LoginButton loginButton;
+    private FirebaseAuth fireBaseAuth;
+    private CallbackManager callbackManager;
+
     private ListView listaLinhas;
     private ArrayAdapter<String> itensAdaptador;
     private ArrayList<String> codigo;
@@ -55,8 +76,169 @@ public class MainActivity extends AppCompatActivity {
         listaLinhas = (ListView) findViewById(R.id.listviewid);
         carregaLinhas();
 
+        inicializarComponente();
+        inicializarFirebaseCallback();
+        clickButton();
+        
+//        if (AccessToken.getCurrentAccessToken() == null) {
+//            goLoginScreen();
+//        }
+
+    }
+
+    private void clickButton() {
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                firebaseLogin(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                alert("Operação Cancelada");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                alert("Erro no login com o Facebook");
+            }
+        });
+
+    }
+
+    private void firebaseLogin(AccessToken accessToken) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
+        fireBaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    Intent i = new Intent(MainActivity.this,Perfil.class);
+                    startActivity(i);
+                }else{
+                    alert("Erro de Autenticação com o Firebase");
+
+                }
+            }
+        });
+    }
+
+    private void alert(String s) {
+        Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
+    }
+
+    private void inicializarFirebaseCallback() {
+        fireBaseAuth = FirebaseAuth.getInstance();
+        callbackManager = CallbackManager.Factory.create();
+
+    }
+
+
+    private void inicializarComponente() {
+        loginButton = (LoginButton) findViewById(R.id.btnLogin);
+        loginButton.setReadPermissions("email","public_profile");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
+    private void carregaLinhas() {
 
         try {
+            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM linhas", null);
+
+            int indiceColunaCodigo = cursor.getColumnIndex("codigo");
+            int indiceColunaNome = cursor.getColumnIndex("nome");
+            int indiceColunaId = cursor.getColumnIndex("idlinha");
+
+            codigo = new ArrayList<String>();
+            nome = new ArrayList<String>();
+            idlinha = new ArrayList<String>();
+            resultado = new ArrayList<String>();
+
+
+
+
+
+
+            itensAdaptador = new ArrayAdapter<String>(getApplicationContext(),
+                    android.R.layout.simple_list_item_1,
+                    android.R.id.text1,
+                    resultado);
+
+
+
+            listaLinhas.setAdapter(itensAdaptador);
+
+            linhas = new ArrayList<>();
+            linhas.add("linha");
+
+            listaLinhas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String linhaid = idlinha.get(position);
+                    Log.i("IDLinha", linhaid);
+
+                    //carregaParadas(idlinha.get(position));
+
+
+                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                    intent.putExtra("idLinha", linhaid);
+                    startActivity(intent);
+                }
+            });
+
+
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                codigo.add(cursor.getString(indiceColunaCodigo));
+                nome.add(cursor.getString(indiceColunaNome));
+                idlinha.add(cursor.getString(indiceColunaId));
+                resultado.add(cursor.getString(indiceColunaCodigo)+" "+cursor.getString(indiceColunaNome));
+
+                //Log.i("LogX","Código: " + cursor.getString(indiceColunaCodigo) + " Linha: " +cursor.getString(indiceColunaNome));
+                cursor.moveToNext();
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // carregará o mapa com as paradas carregadas.
+    private void carregaParadas(String idLinha) {
+        try {
+            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha =" + idLinha, null);
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+
+
+                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                cursor.moveToNext();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+        /*
+        try{
             //tabeta das linhas
             AssetManager assetManager = getResources().getAssets();
             InputStream inputStream = assetManager.open("newlinhas.csv");
@@ -71,21 +253,21 @@ public class MainActivity extends AppCompatActivity {
 
             bancoDados.execSQL("CREATE TABLE IF NOT EXISTS linhas (idlinha INT(5), nome VARCHAR (50), codigo VARCHAR(10), tipo VARCHAR(5))");
 
-            String tabela = "linhas";
-            String colunas = "idlinha, nome, codigo, tipo";
+            String tabela ="linhas";
+            String colunas ="idlinha, nome, codigo, tipo";
             String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
             String str2 = ");";
 
-            while ((linha = bufferedReader.readLine()) != null) {
+            while((linha = bufferedReader.readLine())!=null){
                 //Imprime linha
                 //Log.i("Print: ", paradas);
 
                 StringBuilder sb = new StringBuilder(str1);
                 String[] str = linha.split(";");
-                sb.append(str[0] + ",");
-                sb.append("'" + str[1] + "',");
-                sb.append("'" + str[2] + "',");
-                sb.append("'" + str[3] + "'");
+                sb.append(str[0] +"," );
+                sb.append("'" + str[1] +"',");
+                sb.append("'" + str[2] +"'," );
+                sb.append("'" + str[3] +"'" );
                 sb.append(str2);
 
                 bancoDados.execSQL(sb.toString());
@@ -94,13 +276,15 @@ public class MainActivity extends AppCompatActivity {
 
             }
             inputStream.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e ){
             e.printStackTrace();
         }
+        */
 
 
-        //tabeta das paradas
-        /*
+    //tabeta das paradas
+/*
         try {
 
             AssetManager assetManager = getResources().getAssets();
@@ -147,14 +331,15 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        */
 
-        //Contrução do banco de dados, é aberta as tabelas e importadas para o banco, sendo feitas uma a uma.
-        /*
-        try
+    }
+*/
 
-        {
-            //tabela de coordenadas
+
+    //Contrução do banco de dados, é aberta as tabelas e importadas para o banco, sendo feitas uma a uma.
+/*
+        try {
+           //tabela de coordenadas
 
             AssetManager assetManager = getResources().getAssets();
             InputStream inputStream = assetManager.open("coordenadas.csv");
@@ -169,12 +354,12 @@ public class MainActivity extends AppCompatActivity {
             //Inserir tabela de coordenadas
             bancoDados.execSQL("CREATE TABLE IF NOT EXISTS coordenadas (idcoordenada INT(10), latitude DOUBLE(20), longitude DOUBLE(20), idlinha INT(5))");
 
-            String tabela = "coordenadas";
-            String colunas = "idcoordenada, latitude, longitude, idlinha";
+            String tabela ="coordenadas";
+            String colunas ="idcoordenada, latitude, longitude, idlinha";
             String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
             String str2 = ");";
 
-            while ((coordenada = bufferedReader.readLine()) != null) {
+            while((coordenada = bufferedReader.readLine())!=null) {
                 //Imprime linha
                 //Log.i("Print: ", coordenada);
 
@@ -193,17 +378,14 @@ public class MainActivity extends AppCompatActivity {
             }
             String mensagem = "Pronto";
             Log.i("Concluído: ", mensagem);
-            inputStream.close();
+                inputStream.close();
 
-        } catch (
-                Exception e)
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        {
-            e.printStackTrace();
-        }*/
 
-    }
-
+*/
 
 
             /*Exibir o conteudo do banco
@@ -305,97 +487,6 @@ public class MainActivity extends AppCompatActivity {
         }*/
 
 
-    //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
-    private void carregaLinhas() {
-
-        try {
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM linhas", null);
-
-            int indiceColunaCodigo = cursor.getColumnIndex("codigo");
-            int indiceColunaNome = cursor.getColumnIndex("nome");
-            int indiceColunaId = cursor.getColumnIndex("idlinha");
-
-            codigo = new ArrayList<String>();
-            nome = new ArrayList<String>();
-            idlinha = new ArrayList<String>();
-            resultado = new ArrayList<String>();
-
-
-
-
-
-
-            itensAdaptador = new ArrayAdapter<String>(getApplicationContext(),
-                    android.R.layout.simple_list_item_1,
-                    android.R.id.text1,
-                    resultado);
-
-
-
-            listaLinhas.setAdapter(itensAdaptador);
-
-            linhas = new ArrayList<>();
-            linhas.add("linha");
-
-            listaLinhas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String linhaid = idlinha.get(position);
-                    Log.i("IDLinha", linhaid);
-
-                    //carregaParadas(idlinha.get(position));
-
-
-                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                    intent.putExtra("idLinha", linhaid);
-                    startActivity(intent);
-                }
-            });
-
-
-            cursor.moveToFirst();
-            while (cursor != null) {
-
-                codigo.add(cursor.getString(indiceColunaCodigo));
-                nome.add(cursor.getString(indiceColunaNome));
-                idlinha.add(cursor.getString(indiceColunaId));
-                resultado.add(cursor.getString(indiceColunaCodigo)+" "+cursor.getString(indiceColunaNome));
-
-                //Log.i("LogX","Código: " + cursor.getString(indiceColunaCodigo) + " Linha: " +cursor.getString(indiceColunaNome));
-                cursor.moveToNext();
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // carregará o mapa com as paradas carregadas.
-    private void carregaParadas(String idLinha) {
-        try {
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha =" + idLinha, null);
-            cursor.moveToFirst();
-            while (cursor != null) {
-
-                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
-                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-
-
-                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
-                cursor.moveToNext();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -426,4 +517,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+//    private void goLoginScreen() {
+//        Intent intent = new Intent(this, LoginActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
+//    }
+//
+//    public void logout(View view) {
+//        LoginManager.getInstance().logOut();
+//        goLoginScreen();
+//    }
 }
