@@ -15,20 +15,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.util.ArrayList;
-<<<<<<< HEAD
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,7 +29,8 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthProvider;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -193,56 +186,6 @@ public class MainActivity extends AppCompatActivity {
                     //carregaParadas(idlinha.get(position));
 
 
-<<<<<<< HEAD
-=======
-    }
-
-
-    //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
-    private void carregaLinhas() {
-
-        try {
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM linhas", null);
-
-            int indiceColunaCodigo = cursor.getColumnIndex("codigo");
-            int indiceColunaNome = cursor.getColumnIndex("nome");
-            int indiceColunaId = cursor.getColumnIndex("idlinha");
-
-            codigo = new ArrayList<String>();
-            nome = new ArrayList<String>();
-            idlinha = new ArrayList<String>();
-            resultado = new ArrayList<String>();
-
-
-
-
-
-
-            itensAdaptador = new ArrayAdapter<String>(getApplicationContext(),
-                    android.R.layout.simple_list_item_1,
-                    android.R.id.text1,
-                    resultado);
-
-
-
-            listaLinhas.setAdapter(itensAdaptador);
-
-            linhas = new ArrayList<>();
-            linhas.add("linha");
-
-            listaLinhas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String linhaid = idlinha.get(position);
-                    Log.i("IDLinha", linhaid);
-
-                    //carregaParadas(idlinha.get(position));
-
-
->>>>>>> parent of 1092c59... botoes de zoom
                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                     intent.putExtra("idLinha", linhaid);
                     startActivity(intent);
