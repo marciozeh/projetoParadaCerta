@@ -74,13 +74,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     SQLiteDatabase bancoDados;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -101,7 +97,234 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //listaLinhas = (ListView) findViewById(R.id.listviewid);
         //carregaLinhas();
+    }
 
+    /**
+     * Saves the state of the map when the activity is paused.
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mMap != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
+            super.onSaveInstanceState(outState);
+        }
+    }
+
+    /**
+     * Manipulates the map when it's available.
+     * This callback is triggered when the map is ready to be used.
+     */
+    @Override
+    public void onMapReady(GoogleMap map) {
+        mMap = map;
+
+        tabelaCoordenadas();
+        //mostraLinhas();
+
+        // Prompt the user for permission.
+        getLocationPermission();
+
+        // Turn on the My Location layer and the related control on the map.
+        updateLocationUI();
+
+        // Get the current location of the device and set the position of the map.
+        getDeviceLocation();
+
+    }
+
+    private void mostraLinhas() {
+        try {
+            String texto = "nada";
+            //Log.i("passou aqui",texto);
+            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha = 125", null);
+
+            int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+            int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+            //int indiceColunaIdCoordenada = cursor.getColumnIndex("idcoordenada");
+
+            //PolylineOptions lineOptions = null;
+
+            //lineOptions = new PolylineOptions();
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
+                double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+                //String idcoordenada = cursor.getString(indiceColunaIdCoordenada);
+
+
+                //lineOptions.add(new LatLng(latitude, longitude));
+                //Polyline polyline1 = mMap.addPolyline(lineOptions);
+                LatLng parada = new LatLng(latitude, longitude);
+                mMap.addMarker(new MarkerOptions().position(parada).title("Parada x"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
+                mMap.getUiSettings().setZoomControlsEnabled(true);
+                float zoomnivel = 14.0f;
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
+
+
+                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                cursor.moveToNext();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void mostraparadas(double latiAtual, double longiAtual) {
+
+        try {
+            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+
+                double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
+                double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+
+
+                double R = 6371e3; // metres
+                double l1 = Math.toRadians(latiAtual);
+                double l2 = Math.toRadians(latiParada);
+                double del1 = Math.toRadians(latiParada - latiAtual);
+                double del2 = Math.toRadians(longiParada - longiAtual);
+
+                double a = Math.sin(del1/2) * Math.sin(del1/2) +
+                        Math.cos(l1) * Math.cos(l2) *
+                                Math.sin(del2/2) * Math.sin(del2/2);
+                double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+                double d = R * c;
+
+                    if(d <= 5000) {
+                        LatLng parada = new LatLng(latiParada, longiParada);
+                        mMap.addMarker(new MarkerOptions().position(parada).title(Double.toString(d)));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
+                        mMap.getUiSettings().setZoomControlsEnabled(true);
+                        float zoomnivel = 14.0f;
+                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
+                    }
+
+
+                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                cursor.moveToNext();
+            }
+            //botoes de zoom
+            MarkerOptions marker = new MarkerOptions();
+            mMap.addMarker(marker);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Gets the current location of the device, and positions the map's camera.
+     */
+    private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+            if (mLocationPermissionGranted) {
+                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            mLastKnownLocation = task.getResult();
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(mLastKnownLocation.getLatitude(),
+                                            mLastKnownLocation.getLongitude()), 14.0f));
+
+                            mostraparadas(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+
+
+                        } else {
+                            Log.d(TAG, "Current location is null. Using defaults.");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                            mMap.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                        }
+                    }
+                });
+            }
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage());
+        }
+    }
+
+
+    /**
+     * Prompts the user for permission to use the device location.
+     */
+    private void getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    /**
+     * Handles the result of the request for location permissions.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        mLocationPermissionGranted = false;
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationPermissionGranted = true;
+                }
+            }
+        }
+        updateLocationUI();
+    }
+
+
+    /**
+     * Updates the map's UI settings based on whether the user has granted location permission.
+     */
+    private void updateLocationUI() {
+        if (mMap == null) {
+            return;
+        }
+        try {
+            if (mLocationPermissionGranted) {
+                mMap.setMyLocationEnabled(true);
+                mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            } else {
+                mMap.setMyLocationEnabled(false);
+                mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                mLastKnownLocation = null;
+                getLocationPermission();
+            }
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage());
+        }
     }
 
     //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
@@ -184,241 +407,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    /**
-     * Saves the state of the map when the activity is paused.
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (mMap != null) {
-            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
-            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
-            super.onSaveInstanceState(outState);
-        }
-    }
-
-
-    /**
-     * Manipulates the map when it's available.
-     * This callback is triggered when the map is ready to be used.
-     */
-    @Override
-    public void onMapReady(GoogleMap map) {
-        mMap = map;
-
-        tabelaCoordenadas();
-        mostraLinhas();
-
-        // Prompt the user for permission.
-        //getLocationPermission();
-
-        // Turn on the My Location layer and the related control on the map.
-        //updateLocationUI();
-
-        // Get the current location of the device and set the position of the map.
-        //getDeviceLocation();
-
-    }
-
-    private void mostraLinhas() {
-        try {
-            String texto = "nada";
-            Log.i("passou aqui",texto);
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha = 125", null);
-
-            int indiceColunaLatitude = cursor.getColumnIndex("latitude");
-            int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-            int indiceColunaIdCoordenada = cursor.getColumnIndex("idcoordenada");
-
-            //PolylineOptions lineOptions = null;
-
-            //lineOptions = new PolylineOptions();
-            cursor.moveToFirst();
-            while (cursor != null) {
-
-                double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
-                double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-                String idcoordenada = cursor.getString(indiceColunaIdCoordenada);
-
-
-                //lineOptions.add(new LatLng(latitude, longitude));
-                //Polyline polyline1 = mMap.addPolyline(lineOptions);
-                LatLng parada = new LatLng(latitude, longitude);
-                mMap.addMarker(new MarkerOptions().position(parada).title(idcoordenada));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
-                mMap.getUiSettings().setZoomControlsEnabled(true);
-                float zoomnivel = 14.0f;
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
-
-
-                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
-                cursor.moveToNext();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    private double deg2rad(double deg) {
-        return (deg * Math.PI / 180.0);
-    }
-
-    private void mostraparadas() {
-        double latiAtual = mLastKnownLocation.getLatitude();
-        double longiAtual = mLastKnownLocation.getLongitude();
-
-
-        try {
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
-            cursor.moveToFirst();
-            while (cursor != null) {
-
-                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
-                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-
-                double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
-                double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-                int R = 6371;
-
-                Double latDistance = deg2rad(latiParada - latiAtual);
-                Double lonDistance = deg2rad(longiParada - longiAtual);
-
-                Double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                        + Math.cos(deg2rad(latiAtual)) * Math.cos(deg2rad(latiParada))
-                        * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-                Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                double distance = R * c * 1000; // convert to meters
-
-                double height = 0;
-                distance = Math.pow(distance, 2) + Math.pow(height, 2);
-
-                double distanciaPontos = Math.sqrt(distance);
-
-                if (distanciaPontos <= 1000) {
-                    LatLng parada = new LatLng(latiParada, longiParada);
-                    mMap.addMarker(new MarkerOptions().position(parada).title("Parada Próxima"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
-                    mMap.getUiSettings().setZoomControlsEnabled(true);
-                    float zoomnivel = 14.0f;
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
-                }
-
-
-                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
-                cursor.moveToNext();
-            }
-            //botoes de zoom
-            MarkerOptions marker = new MarkerOptions();
-            mMap.addMarker(marker);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Gets the current location of the device, and positions the map's camera.
-     */
-    private void getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
-        try {
-            if (mLocationPermissionGranted) {
-                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), 10.2f));
-
-
-                        } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
-                            Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-                            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
-        }
-    }
-
-
-    /**
-     * Prompts the user for permission to use the device location.
-     */
-    private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-    }
-
-    /**
-     * Handles the result of the request for location permissions.
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
-                }
-            }
-        }
-        updateLocationUI();
-    }
-
-
-    /**
-     * Updates the map's UI settings based on whether the user has granted location permission.
-     */
-    private void updateLocationUI() {
-        if (mMap == null) {
-            return;
-        }
-        try {
-            if (mLocationPermissionGranted) {
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            } else {
-                mMap.setMyLocationEnabled(false);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                mLastKnownLocation = null;
-                getLocationPermission();
-            }
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
-        }
-    }
 
     //banco
 
@@ -466,7 +454,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //tabeta das paradas
 
-    private void tabelaParadas() {
+    /*private void tabelaParadas() {
         try {
             AssetManager assetManager = getResources().getAssets();
             InputStream inputStream = assetManager.open("newparadas.csv");
@@ -501,13 +489,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 
 
     //Contrução do banco de dados, é aberta as tabelas e importadas para o banco, sendo feitas uma a uma.
     private void tabelaCoordenadas() {
-        try {String texto = "tabela";
+        try {
+            String texto = "tabela";
             Log.i("passou aqui",texto);
             //tabela de coordenadas
             AssetManager assetManager = getResources().getAssets();
