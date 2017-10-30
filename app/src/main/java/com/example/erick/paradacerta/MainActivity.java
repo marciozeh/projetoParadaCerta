@@ -26,6 +26,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.IOException;
+
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -39,10 +41,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     public static final int SIGN_IN_CODE = 777;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        try {
+            new DataBaseHelper(this).createDataBase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         inicializarComponente();
         inicializarFirebaseCallback();
@@ -67,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
     }
+
+
 
     private void clickButton() {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
