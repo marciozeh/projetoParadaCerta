@@ -48,15 +48,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         inicializarFirebaseCallback();
         clickButton();
 
+        //Inicia o componente
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-
+        //Autenticação do gmail
         googleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
+        //Cria o Button utilizando a autenticação
         signInButton = (SignInButton) findViewById(R.id.signInButton);
         signInButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -90,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 alert("Erro no login com o Facebook");
             }
         });
-
     }
 
     private void inicializarFirebaseCallback() {
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         loginButton = (LoginButton) findViewById(R.id.btnLogin);
         loginButton.setReadPermissions("email","public_profile");
     }
+
     private void firebaseLogin(AccessToken accessToken) {
         AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
         fireBaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         });
     }
 
+    //Alert para passar a mensagem de resultado
     private void alert(String s) {
         Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
     }
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+    //Inicia a sessão redirecionando para a activity do maps
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()){
             goMapsScreen();
@@ -143,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
+    //Redireciona para a activity do maps
     private void goMapsScreen() {
         Intent intent = new Intent(this, MapsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -151,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
 }
