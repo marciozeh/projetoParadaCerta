@@ -3,7 +3,6 @@ package com.example.erick.paradacerta;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
@@ -27,14 +26,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -48,7 +45,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private final LatLng mDefaultLocation = new LatLng(-30.0277, -51.2287);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
@@ -88,7 +85,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         // Construct a FusedLocationProviderClient.
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+       mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -119,8 +116,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-        tabelaCoordenadas();
-        //mostraLinhas();
+        mostraLinhas();
+        //mostraparadas(-30.0277, -51.2287);
 
         // Prompt the user for permission.
         getLocationPermission();
@@ -135,28 +132,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void mostraLinhas() {
         try {
+
             String texto = "nada";
-            //Log.i("passou aqui",texto);
+            //Log.i("Mostra Linha",texto);
             bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha = 125", null);
 
             int indiceColunaLatitude = cursor.getColumnIndex("latitude");
             int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-            //int indiceColunaIdCoordenada = cursor.getColumnIndex("idcoordenada");
 
-            //PolylineOptions lineOptions = null;
 
-            //lineOptions = new PolylineOptions();
+            PolylineOptions lineOptions = null;
+
+            lineOptions = new PolylineOptions();
             cursor.moveToFirst();
             while (cursor != null) {
 
                 double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                 double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-                //String idcoordenada = cursor.getString(indiceColunaIdCoordenada);
 
 
-                //lineOptions.add(new LatLng(latitude, longitude));
-                //Polyline polyline1 = mMap.addPolyline(lineOptions);
+                lineOptions.add(new LatLng(latitude, longitude));
+                Polyline polyline1 = mMap.addPolyline(lineOptions);
                 LatLng parada = new LatLng(latitude, longitude);
                 mMap.addMarker(new MarkerOptions().position(parada).title("Parada x"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
@@ -177,7 +174,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void mostraparadas(double latiAtual, double longiAtual) {
 
         try {
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+
+
+            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
+
+            //new DataBaseHelper(this).openDataBase();
+
+            String texto = "nada";
+            Log.i("Mostra Linha",texto);
 
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
             cursor.moveToFirst();
@@ -185,9 +189,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 int indiceColunaLatitude = cursor.getColumnIndex("latitude");
                 int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
 
                 double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                 double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
 
 
                 double R = 6371e3; // metres
@@ -203,17 +209,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 double d = R * c;
 
-                    if(d <= 5000) {
+                    if(d <= 500) {
                         LatLng parada = new LatLng(latiParada, longiParada);
-                        mMap.addMarker(new MarkerOptions().position(parada).title(Double.toString(d)));
+                        LatLng userLoc = new LatLng(latiAtual,longiAtual);
+                        mMap.addMarker(new MarkerOptions().position(parada).title(Integer.toString(idLinha)));
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
                         mMap.getUiSettings().setZoomControlsEnabled(true);
                         float zoomnivel = 14.0f;
-                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, zoomnivel));
                     }
 
 
-                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
                 cursor.moveToNext();
             }
             //botoes de zoom
@@ -245,6 +252,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), 14.0f));
 
+                            Log.i(null,"pegando localizacao");
                             mostraparadas(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
 
@@ -331,6 +339,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void carregaLinhas() {
 
         try {
+
             bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
 
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM linhas", null);
@@ -408,201 +417,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    //banco
 
-
-
-
-
-    /*
-        try{
-            //tabeta das linhas
-            AssetManager assetManager = getResources().getAssets();
-            InputStream inputStream = assetManager.open("newlinhas.csv");
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String linha;
-            LinkedList<String> linhas = new LinkedList<String>();
-            // banco abrir
-            SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-            bancoDados.execSQL("CREATE TABLE IF NOT EXISTS linhas (idlinha INT(5), nome VARCHAR (50), codigo VARCHAR(10), tipo VARCHAR(5))");
-            String tabela ="linhas";
-            String colunas ="idlinha, nome, codigo, tipo";
-            String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
-            String str2 = ");";
-            while((linha = bufferedReader.readLine())!=null){
-                //Imprime linha
-                //Log.i("Print: ", paradas);
-                StringBuilder sb = new StringBuilder(str1);
-                String[] str = linha.split(";");
-                sb.append(str[0] +"," );
-                sb.append("'" + str[1] +"',");
-                sb.append("'" + str[2] +"'," );
-                sb.append("'" + str[3] +"'" );
-                sb.append(str2);
-                bancoDados.execSQL(sb.toString());
-                //Imprime linha
-                //Log.i("Append: ", sb.toString());
-            }
-            inputStream.close();
-        }
-        catch (Exception e ){
-            e.printStackTrace();
-        }
-        */
-
-
-    //tabeta das paradas
-
-    /*private void tabelaParadas() {
-        try {
-            AssetManager assetManager = getResources().getAssets();
-            InputStream inputStream = assetManager.open("newparadas.csv");
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String parada;
-            LinkedList<String> paradas = new LinkedList<String>();
-            // banco abrir
-            SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-            bancoDados.execSQL("CREATE TABLE IF NOT EXISTS paradas (idparada INT(5), codigo INT(5), longitude DOUBLE(10), latitude DOUBLE(10), terminal VARCHAR (2))");
-            String tabela = "paradas";
-            String colunas = "idparada, codigo, longitude, latitude, terminal";
-            String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
-            String str2 = ");";
-            while ((parada = bufferedReader.readLine()) != null) {
-                //Imprime linha
-                //Log.i("Print: ", paradas);
-                StringBuilder sb = new StringBuilder(str1);
-                String[] str = parada.split(";");
-                sb.append(str[0] + ",");
-                sb.append(str[1] + ",");
-                sb.append(str[2] + ",");
-                sb.append(str[3] + ",");
-                sb.append("'" + str[4] + "'");
-                sb.append(str2);
-                bancoDados.execSQL(sb.toString());
-                //Imprime linha
-            }
-            String mensagem = "Pronto";
-            Log.i("Concluído: ", mensagem);
-            inputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
-
-
-
-    //Contrução do banco de dados, é aberta as tabelas e importadas para o banco, sendo feitas uma a uma.
-    private void tabelaCoordenadas() {
-        try {
-            String texto = "tabela";
-            Log.i("passou aqui",texto);
-            //tabela de coordenadas
-            AssetManager assetManager = getResources().getAssets();
-            InputStream inputStream = assetManager.open("coordenadas.csv");
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String coordenada;
-            LinkedList<String> coordenadas = new LinkedList<String>();
-            // banco abrir
-            SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-            //Inserir tabela de coordenadas
-            bancoDados.execSQL("CREATE TABLE IF NOT EXISTS coordenadas (idcoordenada INT(10), latitude DOUBLE(20), longitude DOUBLE(20), idlinha INT(5))");
-            String tabela = "coordenadas";
-            String colunas = "idcoordenada, latitude, longitude, idlinha";
-            String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
-            String str2 = ");";
-            while ((coordenada = bufferedReader.readLine()) != null) {
-                //Imprime linha
-                //Log.i("Print: ", coordenada);
-                StringBuilder sb = new StringBuilder(str1);
-                String[] str = coordenada.split(",");
-                sb.append(str[0] + ",");
-                sb.append(str[1] + ",");
-                sb.append(str[2] + ",");
-                sb.append(str[3]);
-                sb.append(str2);
-                //Insere no banco
-                bancoDados.execSQL(sb.toString());
-                //Imprime linha
-                //Log.i("Append: ", sb.toString());
-            }
-            String mensagem = "Pronto";
-            Log.i("Concluído: ", mensagem);
-            inputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-            /*Exibir o conteudo do banco
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
-            int indiceColuneId = cursor.getColumnIndex("idcoordenada");
-            int indiceColuneCodigo = cursor.getColumnIndex("latitude");
-            int indiceColunelongitude = cursor.getColumnIndex("longitude");
-            int indiceColunelatitude = cursor.getColumnIndex("idlinha");
-            cursor.moveToFirst();
-            while (cursor != null) {
-                Log.i("Resultado - idcoord: ", cursor.getString(indiceColuneId));
-                Log.i("Resultado - latitude: ", cursor.getString(indiceColuneCodigo));
-                Log.i("Resultado - longitude: ", cursor.getString(indiceColunelongitude));
-                Log.i("Resultado - idlinha: ", cursor.getString(indiceColunelatitude));
-                cursor.moveToNext();
-            }
-            inputStream.close();
-            */
-
-
-            /*
-            //tabeta das paradalinha
-            AssetManager assetManager = getResources().getAssets();
-            InputStream inputStream = assetManager.open("newparadalinha.csv");
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String paradalinha;
-            LinkedList<String> paradalinhas = new LinkedList<String>();
-            // banco abrir
-            SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-            /*bancoDados.execSQL("CREATE TABLE IF NOT EXISTS paradalinha (idlinha INT(5), idparada INT(5))");
-            String tabela ="paradalinha";
-            String colunas ="idlinha, idparada";
-            String str1 = "INSERT INTO " + tabela + " (" + colunas + ") values(";
-            String str2 = ");";
-            while((paradalinha = bufferedReader.readLine())!=null){
-                //Imprime linha
-                //Log.i("Print: ", paradas);
-                StringBuilder sb = new StringBuilder(str1);
-                String[] str = paradalinha.split(";");
-                sb.append(str[0] +"," );
-                sb.append(str[1]);
-                sb.append(str2);
-                bancoDados.execSQL(sb.toString());
-                //Imprime linha
-                //Log.i("Append: ", sb.toString());
-            }
-            inputStream.close();
-            */
-
-
-            /*
-            //Exibir o conteudo do banco
-            AssetManager assetManager = getResources().getAssets();
-            InputStream inputStream = assetManager.open("newparadalinha.csv");
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            SQLiteDatabase bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM paradalinha", null);
-            int indiceColuneId = cursor.getColumnIndex("idparada");
-            int indiceColuneLinha = cursor.getColumnIndex("idlinha");
-            cursor.moveToFirst();
-            while (cursor != null) {
-                Log.i("Resultado - idparada: ", cursor.getString(indiceColuneId));
-                Log.i("Resultado - linha: ", cursor.getString(indiceColuneLinha));
-                cursor.moveToNext();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
 }
