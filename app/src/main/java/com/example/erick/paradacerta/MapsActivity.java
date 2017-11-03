@@ -55,12 +55,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private static CameraPosition mCameraPosition;
 
-    //barra e botao de procurar
-    Button mBtnFind;
-    EditText etPlace;
-
-
-    // The entry point to the Fused Location Provider.
+        // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     // A default location (Sydney, Australia) and default zoom to use when location permission is
@@ -78,6 +73,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    //barra e botao de procurar
+    Button mBtnFind;
+    EditText etPlace;
+
 
     private ListView listaLinhas;
     private ArrayAdapter<String> itensAdaptador;
@@ -86,8 +85,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<String> idlinha;
     private ArrayList<String> resultado;
     static ArrayList<String> linhas;
-    static ArrayAdapter arrayAdapter;
-    public static String linhaid;
 
     SQLiteDatabase bancoDados;
 
@@ -179,9 +176,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-        mostraLinhas();
-        //mostraparadas(-30.0277, -51.2287);
-
         // Prompt the user for permission.
         getLocationPermission();
 
@@ -193,106 +187,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void mostraLinhas() {
-        try {
 
-            String texto = "nada";
-            //Log.i("Mostra Linha",texto);
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha = 125", null);
-
-            int indiceColunaLatitude = cursor.getColumnIndex("latitude");
-            int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-
-
-            PolylineOptions lineOptions = null;
-
-            lineOptions = new PolylineOptions();
-            cursor.moveToFirst();
-            while (cursor != null) {
-
-                double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
-                double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-
-
-                lineOptions.add(new LatLng(latitude, longitude));
-                Polyline polyline1 = mMap.addPolyline(lineOptions);
-                LatLng parada = new LatLng(latitude, longitude);
-                mMap.addMarker(new MarkerOptions().position(parada).title("Parada x"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
-                mMap.getUiSettings().setZoomControlsEnabled(true);
-                float zoomnivel = 14.0f;
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
-
-
-                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
-                cursor.moveToNext();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private void mostraparadas(double latiAtual, double longiAtual) {
-
-        try {
-
-
-            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
-
-            //new DataBaseHelper(this).openDataBase();
-
-            String texto = "nada";
-            Log.i("Mostra Linha",texto);
-
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
-            cursor.moveToFirst();
-            while (cursor != null) {
-
-                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
-                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
-
-                double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
-                double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
-
-
-                double R = 6371e3; // metres
-                double l1 = Math.toRadians(latiAtual);
-                double l2 = Math.toRadians(latiParada);
-                double del1 = Math.toRadians(latiParada - latiAtual);
-                double del2 = Math.toRadians(longiParada - longiAtual);
-
-                double a = Math.sin(del1/2) * Math.sin(del1/2) +
-                        Math.cos(l1) * Math.cos(l2) *
-                                Math.sin(del2/2) * Math.sin(del2/2);
-                double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-                double d = R * c;
-
-                    if(d <= 500) {
-                        LatLng parada = new LatLng(latiParada, longiParada);
-                        LatLng userLoc = new LatLng(latiAtual,longiAtual);
-                        mMap.addMarker(new MarkerOptions().position(parada).title(Integer.toString(idLinha)));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
-                        mMap.getUiSettings().setZoomControlsEnabled(true);
-                        float zoomnivel = 14.0f;
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, zoomnivel));
-                    }
-
-
-                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
-                cursor.moveToNext();
-            }
-            //botoes de zoom
-            MarkerOptions marker = new MarkerOptions();
-            mMap.addMarker(marker);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Gets the current location of the device, and positions the map's camera.
@@ -398,12 +293,113 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private void mostraLinhas() {
+        try {
+
+            String texto = "nada";
+            //Log.i("Mostra Linha",texto);
+            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha = 125", null);
+
+            int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+            int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+
+
+            PolylineOptions lineOptions = null;
+
+            lineOptions = new PolylineOptions();
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
+                double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+
+
+                lineOptions.add(new LatLng(latitude, longitude));
+                Polyline polyline1 = mMap.addPolyline(lineOptions);
+                LatLng parada = new LatLng(latitude, longitude);
+                mMap.addMarker(new MarkerOptions().position(parada).title("Parada x"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
+                mMap.getUiSettings().setZoomControlsEnabled(true);
+                float zoomnivel = 14.0f;
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
+
+
+                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                cursor.moveToNext();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void mostraparadas(double latiAtual, double longiAtual) {
+
+        try {
+
+
+            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
+
+            //new DataBaseHelper(this).openDataBase();
+
+            String texto = "nada";
+            Log.i("Mostra Linha",texto);
+
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+                int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
+
+                double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
+                double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
+
+
+                double R = 6371e3; // metres
+                double l1 = Math.toRadians(latiAtual);
+                double l2 = Math.toRadians(latiParada);
+                double del1 = Math.toRadians(latiParada - latiAtual);
+                double del2 = Math.toRadians(longiParada - longiAtual);
+
+                double a = Math.sin(del1/2) * Math.sin(del1/2) +
+                        Math.cos(l1) * Math.cos(l2) *
+                                Math.sin(del2/2) * Math.sin(del2/2);
+                double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+                double d = R * c;
+
+                if(d <= 500) {
+                    LatLng parada = new LatLng(latiParada, longiParada);
+                    LatLng userLoc = new LatLng(latiAtual,longiAtual);
+                    mMap.addMarker(new MarkerOptions().position(parada).title(Integer.toString(idLinha)));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
+                    mMap.getUiSettings().setZoomControlsEnabled(true);
+                    float zoomnivel = 14.0f;
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, zoomnivel));
+                }
+
+
+                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                cursor.moveToNext();
+            }
+            //botoes de zoom
+            MarkerOptions marker = new MarkerOptions();
+            mMap.addMarker(marker);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
     private void carregaLinhas() {
 
         try {
 
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
 
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM linhas", null);
 
@@ -480,7 +476,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    // classes da conversão de endereço para coordenadas
+    // metodos da conversão de endereço para coordenadas
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
@@ -612,13 +608,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }*/
 
 
 
