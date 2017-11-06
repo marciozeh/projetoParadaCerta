@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "232235037922",
+    "firebase_url": "https://myproject-5af48.firebaseio.com",
+    "project_id": "myproject-5af48",
+    "storage_bucket": "myproject-5af48.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232235037922:android:ac3a707592eaf2ea",
+        "android_client_info": {
+          "package_name": "com.example.erick.paradacerta"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232235037922-791tluk4jue50tcjlfducteth1l1khed.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.erick.paradacerta",
+            "certificate_hash": "ae4186c262d3ed573ea719c0c6e53b5d741599cf"
+          }
+        },
+        {
+          "client_id": "232235037922-3umbfnvtharop3qve7ka0e83pho81cm5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.erick.paradacerta",
+            "certificate_hash": "18c244995fd592d1ebff33a149b6675006283898"
+          }
+        },
+        {
+          "client_id": "232235037922-kuknqs61enjjg31hfosaeg03v33g52cf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.erick.paradacerta",
+            "certificate_hash": "8356df11910c21c04bcf5b1281e3d8b5169d6bb2"
+          }
+        },
+        {
+          "client_id": "232235037922-h6ovphlu4m93rjleits9akk9lvn6f3oh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNcwSxYzQidWvzDO9fTO7Uh_J48tQHDwY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232235037922-h6ovphlu4m93rjleits9akk9lvn6f3oh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
