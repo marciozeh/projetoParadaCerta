@@ -27,6 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -210,7 +211,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), 14.0f));
 
-                            Log.i(null,"pegando localizacao");
+                            //Log.i(null,"pegando localizacao");
                             mostraparadas(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
 
@@ -337,14 +338,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void mostraparadas(double latiAtual, double longiAtual) {
 
         try {
-
-
             bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
-
-            //new DataBaseHelper(this).openDataBase();
-
-            String texto = "nada";
-            Log.i("Mostra Linha",texto);
 
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
             cursor.moveToFirst();
@@ -359,20 +353,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
 
 
-                double R = 6371e3; // metres
-                double l1 = Math.toRadians(latiAtual);
-                double l2 = Math.toRadians(latiParada);
-                double del1 = Math.toRadians(latiParada - latiAtual);
-                double del2 = Math.toRadians(longiParada - longiAtual);
-
-                double a = Math.sin(del1/2) * Math.sin(del1/2) +
-                        Math.cos(l1) * Math.cos(l2) *
-                                Math.sin(del2/2) * Math.sin(del2/2);
-                double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-                double d = R * c;
-
-                if(d <= 500) {
+                if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 500) {
                     LatLng parada = new LatLng(latiParada, longiParada);
                     LatLng userLoc = new LatLng(latiAtual,longiAtual);
                     mMap.addMarker(new MarkerOptions().position(parada).title(Integer.toString(idLinha)));
@@ -382,8 +363,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, zoomnivel));
                 }
 
-
-                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
                 cursor.moveToNext();
             }
             //botoes de zoom
@@ -393,6 +373,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
     }
+        // calculo da distancia separado da função de marcadores de paradas próximas.
+        private double distancia(double latiAtual, double longiAtual, double latiParada, double longiParada){
+            double R = 6371e3; // metres
+            double l1 = Math.toRadians(latiAtual);
+            double l2 = Math.toRadians(latiParada);
+            double del1 = Math.toRadians(latiParada - latiAtual);
+            double del2 = Math.toRadians(longiParada - longiAtual);
+
+            double a = Math.sin(del1/2) * Math.sin(del1/2) +
+                    Math.cos(l1) * Math.cos(l2) *
+                            Math.sin(del2/2) * Math.sin(del2/2);
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            double d = R * c;
+            return d;
+        }
 
     //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
     private void carregaLinhas() {
@@ -593,14 +589,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 LatLng latLng = new LatLng(lat, lng);
 
-                // Setting the position for the marker
-                markerOptions.position(latLng);
+                // Setting the position for the marker e muda a cor do marcador do destino
+                markerOptions.position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
                 // Setting the title for the marker
                 markerOptions.title(name);
 
                 // Placing a marker on the touched position
                 mMap.addMarker(markerOptions);
+
+                //mostrando paradas proximas ao endereco pedido
+                mostraparadas(lat, lng);
 
                 // Locate the first location
                 if(i==0)
