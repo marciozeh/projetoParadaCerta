@@ -338,6 +338,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void mostraparadas(double latiAtual, double longiAtual) {
 
         try {
+            String nomeLinha = null;
+
             bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
 
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
@@ -353,7 +355,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
 
 
-                if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 500) {
+                if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 100) {
+                    //printar o nome da linha está com problema, app fica carregando e nunca termina quando tento consultar a tabela do banco que contem a lista de linhas, é necessário atenção aqui.
+                    //nomeLinha = marcadores(idLinha);
+
                     LatLng parada = new LatLng(latiParada, longiParada);
                     LatLng userLoc = new LatLng(latiAtual,longiAtual);
                     mMap.addMarker(new MarkerOptions().position(parada).title(Integer.toString(idLinha)));
@@ -388,6 +393,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             double d = R * c;
             return d;
+        }
+
+        //carrega nome nos marcadores
+
+        private String marcadores(int idLinha){
+            String nomeLinha = null;
+            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
+            Cursor cursor1 = bancoDados.rawQuery("SELECT * FROM linhas WHERE idlinha = "+idLinha, null);
+            cursor1.moveToFirst();
+            while (cursor1 != null) {
+                int indiceColunaNome = cursor1.getColumnIndex("nome");
+                //int indiceColunaCodigo = cursor1.getColumnIndex("codigo");
+                nomeLinha = cursor1.getString(indiceColunaNome);
+
+            }
+            return nomeLinha;
         }
 
     //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
