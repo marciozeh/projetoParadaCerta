@@ -1,5 +1,16 @@
 <resources>
     <string name="app_name">ParadaCerta</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="maps">Maps</string>
+    <string name="android_studio">Android Studio</string>
+    <string name="android_studio_android_com">android.studio@android.com</string>
+    <string name="title_activity_cadastro">CadastroActivity</string>
+    <string name="cadastro">Cadastro</string>
+
     <string name="facebook_app_id">123395015083242</string>
     <string name="fb_login_protocol_scheme">fb123395015083242</string>
     <string name="google_maps_key">AIzaSyDMSo3CTQt5qjs1nzgpDZGbbNAWx5nXPho</string>
