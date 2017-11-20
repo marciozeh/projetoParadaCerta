@@ -22,39 +22,39 @@
         app:headerLayout="@layout/nav_header_maps"
         app:menu="@menu/activity_maps_drawer" />
 
-    <ImageView
-        android:id="@+id/ivFoto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    <!--<ImageView-->
+        <!--android:id="@+id/ivFoto"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content" />-->
 
-    <TextView
-        android:id="@+id/tvEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+    <!--<TextView-->
+        <!--android:id="@+id/tvEmail"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="TextView" />-->
 
-    <TextView
-        android:id="@+id/tvId"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+    <!--<TextView-->
+        <!--android:id="@+id/tvId"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="TextView" />-->
 
-    <TextView
-        android:id="@+id/tvCpf"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+    <!--<TextView-->
+        <!--android:id="@+id/tvCpf"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="TextView" />-->
 
-    <TextView
-        android:id="@+id/tvDtNascimento"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+    <!--<TextView-->
+        <!--android:id="@+id/tvDtNascimento"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="TextView" />-->
 
-    <Button
-        android:id="@+id/btnLogOut"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="LogOut" />
+    <!--<Button-->
+        <!--android:id="@+id/btnLogOut"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="LogOut" />-->
 
 </android.support.v4.widget.DrawerLayout>

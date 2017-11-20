@@ -58,7 +58,7 @@
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_cadastro"
+            android:label="MapsActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
