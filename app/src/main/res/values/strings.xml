@@ -16,4 +16,5 @@
     <string name="google_maps_key">AIzaSyDMSo3CTQt5qjs1nzgpDZGbbNAWx5nXPho</string>
     <string name="find">Procure</string>
     <string name="hint">Endereço</string>
+    <string name="title_activity_lista">ListaActivity</string>
 </resources>

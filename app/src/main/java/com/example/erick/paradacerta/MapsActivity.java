@@ -19,15 +19,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -51,7 +47,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -87,20 +82,10 @@ public class MapsActivity extends AppCompatActivity
     Button mBtnFind;
     EditText etPlace;
 
-
-    private ListView listaLinhas;
-    private ArrayAdapter<String> itensAdaptador;
-    private ArrayList<String> codigo;
-    private ArrayList<String> nome;
-    private ArrayList<String> idlinha;
-    private ArrayList<String> resultado;
-    static ArrayList<String> linhas;
-
     SQLiteDatabase bancoDados;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -110,9 +95,8 @@ public class MapsActivity extends AppCompatActivity
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_maps);
 
-
         // Construct a FusedLocationProviderClient.
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -162,7 +146,7 @@ public class MapsActivity extends AppCompatActivity
                 downloadTask.execute(url);
             }
         });
-        //listaLinhas = (ListView) findViewById(R.id.listviewid);
+
         //carregaLinhas();
 
 
@@ -296,7 +280,7 @@ public class MapsActivity extends AppCompatActivity
                                             mLastKnownLocation.getLongitude()), 14.0f));
 
                             //Log.i(null,"pegando localizacao");
-                            mostraparadas(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                            //mostraparadas(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
 
                         } else {
@@ -495,63 +479,7 @@ public class MapsActivity extends AppCompatActivity
         return nomeLinha;
     }
 
-    //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
-    private void carregaLinhas() {
 
-        try {
-
-            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
-
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM linhas", null);
-
-            int indiceColunaCodigo = cursor.getColumnIndex("codigo");
-            int indiceColunaNome = cursor.getColumnIndex("nome");
-            int indiceColunaId = cursor.getColumnIndex("idlinha");
-
-            codigo = new ArrayList<String>();
-            nome = new ArrayList<String>();
-            idlinha = new ArrayList<String>();
-            resultado = new ArrayList<String>();
-
-            itensAdaptador = new ArrayAdapter<String>(getApplicationContext(),
-                    android.R.layout.simple_list_item_1,
-                    android.R.id.text1,
-                    resultado);
-
-            listaLinhas.setAdapter(itensAdaptador);
-
-            linhas = new ArrayList<>();
-            linhas.add("linha");
-
-            listaLinhas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String linhaid = idlinha.get(position);
-                    Log.i("IDLinha", linhaid);
-                    //carregaParadas(idlinha.get(position));
-
-                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                    intent.putExtra("idLinha", linhaid);
-                    startActivity(intent);
-                }
-            });
-
-            cursor.moveToFirst();
-            while (cursor != null) {
-
-                codigo.add(cursor.getString(indiceColunaCodigo));
-                nome.add(cursor.getString(indiceColunaNome));
-                idlinha.add(cursor.getString(indiceColunaId));
-                resultado.add(cursor.getString(indiceColunaCodigo) + " " + cursor.getString(indiceColunaNome));
-
-                //Log.i("LogX","Código: " + cursor.getString(indiceColunaCodigo) + " Linha: " +cursor.getString(indiceColunaNome));
-                cursor.moveToNext();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 
     // carregará o mapa com as paradas carregadas.
@@ -561,13 +489,29 @@ public class MapsActivity extends AppCompatActivity
 
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha =" + idLinha, null);
             cursor.moveToFirst();
-            while (cursor != null) {
+
 
                 int indiceColunaLatitude = cursor.getColumnIndex("latitude");
                 int indiceColunaLongitude = cursor.getColumnIndex("longitude");
 
+                PolylineOptions lineOptions = null;
 
-                Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
+                lineOptions = new PolylineOptions();
+                cursor.moveToFirst();
+                while (cursor != null) {
+
+                    double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
+                    double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+
+
+                    lineOptions.add(new LatLng(latitude, longitude));
+                    Polyline polyline1 = mMap.addPolyline(lineOptions);
+                    LatLng parada = new LatLng(latitude, longitude);
+                    mMap.addMarker(new MarkerOptions().position(parada).title("Parada x"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
+                    mMap.getUiSettings().setZoomControlsEnabled(true);
+                    float zoomnivel = 14.0f;
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
                 cursor.moveToNext();
             }
 
