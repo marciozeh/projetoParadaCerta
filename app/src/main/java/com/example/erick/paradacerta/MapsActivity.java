@@ -95,6 +95,7 @@ public class MapsActivity extends AppCompatActivity
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_maps);
 
+
         // Construct a FusedLocationProviderClient.
         //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -243,16 +244,22 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-        // Prompt the user for permission.
-        getLocationPermission();
+        // Prompt the user for permission. pede permissao ao usuario
+        //getLocationPermission();
 
-        // Turn on the My Location layer and the related control on the map.
-        updateLocationUI();
+        // Turn on the My Location layer and the related control on the map. faz update da localização
+        //updateLocationUI();
 
-        // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
+        // Get the current location of the device and set the position of the map. pega a localização
+        //getDeviceLocation();
 
         //mostraLinhas();
+
+        //recebe o parametro do listaactivity e carrega a rota da linha
+        Bundle bundle = getIntent().getExtras();
+        String idLinha = bundle.getString("idLinha");
+
+        carregaParadas(idLinha);
 
     }
 
@@ -280,7 +287,7 @@ public class MapsActivity extends AppCompatActivity
                                             mLastKnownLocation.getLongitude()), 14.0f));
 
                             //Log.i(null,"pegando localizacao");
-                            //mostraparadas(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                            mostraparadas(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
 
                         } else {
