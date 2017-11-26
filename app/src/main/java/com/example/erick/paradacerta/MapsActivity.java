@@ -51,7 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MapsActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+        implements OnMapReadyCallback {
     DrawerLayout drawer;
     NavigationView navigationView;
     Toolbar toolbar=null;
@@ -81,6 +81,8 @@ public class MapsActivity extends AppCompatActivity
     //barra e botao de procurar
     Button mBtnFind;
     EditText etPlace;
+    Button BtnLista;
+    Button BtnCadastro;
 
     SQLiteDatabase bancoDados;
     @Override
@@ -95,6 +97,23 @@ public class MapsActivity extends AppCompatActivity
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_maps);
 
+        BtnCadastro = (Button) findViewById(R.id.BtnCadastro);
+
+        BtnCadastro.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(MapsActivity.this, CadastroActivity.class);
+                startActivity(i);
+            }
+        });
+
+        BtnLista = (Button) findViewById(R.id.BtnLista);
+
+        BtnLista.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(MapsActivity.this, ListaActivity.class);
+                startActivity(i);
+            }
+        });
 
         // Construct a FusedLocationProviderClient.
         //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -174,67 +193,67 @@ public class MapsActivity extends AppCompatActivity
 //
   }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+//    @Override
+//    public void onBackPressed() {
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            drawer.closeDrawer(GravityCompat.START);
+//        } else {
+//            super.onBackPressed();
+//        }
+//    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.maps, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.maps, menu);
+//        return true;
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        switch (id){
-            case R.id.nav_maps_activity:
-                Intent h = new Intent(MapsActivity.this,MapsActivity.class);
-                startActivity(h);
-                break;
-            case R.id.nav_cadastro:
-                Intent i = new Intent(MapsActivity.this,CadastroActivity.class);
-                startActivity(i);
-                break;
-        }
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (mMap != null) {
-            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
-            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
-            super.onSaveInstanceState(outState);
-        }
-    }
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//        switch (id){
+//            case R.id.nav_maps_activity:
+//                Intent h = new Intent(MapsActivity.this,MapsActivity.class);
+//                startActivity(h);
+//                break;
+//            case R.id.nav_cadastro:
+//                Intent i = new Intent(MapsActivity.this,CadastroActivity.class);
+//                startActivity(i);
+//                break;
+//        }
+//
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        if (mMap != null) {
+//            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
+//            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
+//            super.onSaveInstanceState(outState);
+//        }
+//    }
 
     /**
      * Manipulates the map when it's available.

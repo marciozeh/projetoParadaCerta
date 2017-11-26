@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class ListaActivity extends AppCompatActivity {
     private ArrayList<String> resultado;
     static ArrayList<String> linhas;
 
+    Button BtnMaps;
+    Button BtnCadastro;
 
     SQLiteDatabase bancoDados;
 
@@ -35,6 +38,24 @@ public class ListaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lista);
         listaLinhas = (ListView) findViewById(R.id.listviewid);
         carregaLinhas();
+
+        BtnCadastro = (Button) findViewById(R.id.BtnCadastro);
+
+        BtnCadastro.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(ListaActivity.this, CadastroActivity.class);
+                startActivity(i);
+            }
+        });
+
+        BtnMaps = (Button) findViewById(R.id.BtnMaps);
+
+        BtnMaps.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(ListaActivity.this, MapsActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
