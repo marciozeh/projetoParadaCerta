@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
         <!-- chama a tela inicial do app -->
         <activity
-            android:name=".ListaActivity"
+            android:name=".MainActivity"
             android:label="@string/maps"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -60,7 +60,7 @@
             android:label="MapsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ListaActivity"
             android:label="@string/title_activity_lista"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
