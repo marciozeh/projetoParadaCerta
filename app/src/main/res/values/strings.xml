@@ -17,4 +17,7 @@
     <string name="find">Procure</string>
     <string name="hint">Endereço</string>
     <string name="title_activity_lista">ListaActivity</string>
+    <string name="BtnLista">Lista</string>
+    <string name="BtnCadastro">Cadastro</string>
+    <string name="BtnMaps">Maps</string>
 </resources>
