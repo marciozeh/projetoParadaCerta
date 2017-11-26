@@ -4,33 +4,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
-    tools:context="com.example.erick.paradacerta.MapsActivity">
+    android:orientation="vertical"
+    tools:context="com.example.erick.paradacerta.MapsActivity"
+    android:layout_weight="1">
 
     <Button
         android:id="@+id/btn_show"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/find"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:text="@string/find" />
+
+    <Button
+        android:id="@+id/BtnLista"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/BtnLista"
+        tools:text="Lista" />
+
+    <Button
+        android:id="@+id/BtnCadastro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/BtnCadastro"
+        tools:text="Lista" />
 
     <EditText
         android:id="@+id/et_place"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/btn_show"
         android:hint="@string/hint"
-        android:inputType="text"
-        android:layout_toLeftOf="@id/btn_show" />
+        android:inputType="text" />
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.erick.paradacerta.MapsActivity"
-        android:layout_below="@+id/btn_show" />
+        android:layout_below="@+id/btn_show"
+        tools:context="com.example.erick.paradacerta.MapsActivity" />
 </LinearLayout>
 
 <!--</android.support.v4.widget.DrawerLayout>-->
