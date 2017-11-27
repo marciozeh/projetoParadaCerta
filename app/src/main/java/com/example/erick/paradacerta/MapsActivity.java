@@ -8,22 +8,17 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -52,9 +47,6 @@ import java.util.List;
 
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback {
-    DrawerLayout drawer;
-    NavigationView navigationView;
-    Toolbar toolbar=null;
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
@@ -116,7 +108,7 @@ public class MapsActivity extends AppCompatActivity
         });
 
         // Construct a FusedLocationProviderClient.
-        //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -167,93 +159,16 @@ public class MapsActivity extends AppCompatActivity
             }
         });
 
-        //carregaLinhas();
-
-
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//
-//        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.setDrawerListener(toggle);
-//        toggle.syncState();
-//
-//        navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
-//
   }
 
-//    @Override
-//    public void onBackPressed() {
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        if (drawer.isDrawerOpen(GravityCompat.START)) {
-//            drawer.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.maps, menu);
-//        return true;
-//    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//        switch (id){
-//            case R.id.nav_maps_activity:
-//                Intent h = new Intent(MapsActivity.this,MapsActivity.class);
-//                startActivity(h);
-//                break;
-//            case R.id.nav_cadastro:
-//                Intent i = new Intent(MapsActivity.this,CadastroActivity.class);
-//                startActivity(i);
-//                break;
-//        }
-//
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//        if (mMap != null) {
-//            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
-//            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
-//            super.onSaveInstanceState(outState);
-//        }
-//    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mMap != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
+            super.onSaveInstanceState(outState);
+        }
+    }
 
     /**
      * Manipulates the map when it's available.
@@ -263,14 +178,14 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-        // Prompt the user for permission. pede permissao ao usuario
-        //getLocationPermission();
+//         Prompt the user for permission. pede permissao ao usuario
+        getLocationPermission();
 
-        // Turn on the My Location layer and the related control on the map. faz update da localização
-        //updateLocationUI();
+//         Turn on the My Location layer and the related control on the map. faz update da localização
+        updateLocationUI();
 
-        // Get the current location of the device and set the position of the map. pega a localização
-        //getDeviceLocation();
+//         Get the current location of the device and set the position of the map. pega a localização
+        getDeviceLocation();
 
         //mostraLinhas();
 
@@ -281,8 +196,6 @@ public class MapsActivity extends AppCompatActivity
         carregaParadas(idLinha);
 
     }
-
-
 
     /**
      * Gets the current location of the device, and positions the map's camera.
@@ -449,7 +362,7 @@ public class MapsActivity extends AppCompatActivity
                 int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
 
 
-                if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 100) {
+                if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 300) {
                     //printar o nome da linha está com problema, app fica carregando e nunca termina quando tento consultar a tabela do banco que contem a lista de linhas, é necessário atenção aqui.
                     //nomeLinha = marcadores(idLinha);
 
@@ -505,13 +418,10 @@ public class MapsActivity extends AppCompatActivity
         return nomeLinha;
     }
 
-
-
-
     // carregará o mapa com as paradas carregadas.
     private void carregaParadas(String idLinha) {
         try {
-            bancoDados = openOrCreateDatabase("app", MODE_PRIVATE, null);
+            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
 
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha =" + idLinha, null);
             cursor.moveToFirst();
@@ -529,11 +439,13 @@ public class MapsActivity extends AppCompatActivity
                     double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                     double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
 
-
+                    //printa a rota
                     lineOptions.add(new LatLng(latitude, longitude));
                     Polyline polyline1 = mMap.addPolyline(lineOptions);
                     LatLng parada = new LatLng(latitude, longitude);
-                    mMap.addMarker(new MarkerOptions().position(parada).title("Parada x"));
+
+                    //printa as paradas
+                    //mMap.addMarker(new MarkerOptions().position(parada).title("Parada x"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
                     mMap.getUiSettings().setZoomControlsEnabled(true);
                     float zoomnivel = 14.0f;
