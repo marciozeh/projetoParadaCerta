@@ -60,7 +60,10 @@ public class MapsActivity extends AppCompatActivity
     private ArrayList<Integer> paradaDestino;
     private ArrayList<String> listaLinhas;
     private ListView ListaLinhas;
-    private ArrayAdapter<String> itensAdaptador;
+    private ArrayAdapter<String> itensAdaptador1;
+    static ArrayList<String> linhas1;
+    ArrayList<String> resultado;
+    String linhaString = null;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -198,6 +201,8 @@ public class MapsActivity extends AppCompatActivity
 
 //         Get the current location of the device and set the position of the map. pega a localização
         getDeviceLocation();
+
+        marcadores();
 
         //mostraLinhas();
 
@@ -337,9 +342,7 @@ public class MapsActivity extends AppCompatActivity
 
                 if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 300) {
                     //printar o nome da linha está com problema, app fica carregando e nunca termina quando tento consultar a tabela do banco que contem a lista de linhas, é necessário atenção aqui.
-                    //nomeLinha = marcadores(idLinha);
-
-
+                    nomeLinha = nomeLinhas(idLinha);
 
                     LatLng parada = new LatLng(latiParada, longiParada);
                     LatLng userLoc = new LatLng(latiAtual,longiAtual);
@@ -364,6 +367,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void paradasDestino(double latiAtual, double longiAtual) {
+
 
         try {
             String nomeLinha = null;
@@ -403,16 +407,18 @@ public class MapsActivity extends AppCompatActivity
                 //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
                 cursor.moveToNext();
             }
+
             //botoes de zoom'
             MarkerOptions marker = new MarkerOptions();
             mMap.addMarker(marker);
 
 
-            //abre um listview com as linhas em comum.
-            listaLinhas();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        //abre um listview com as linhas em comum.
+        listaLinhas();
     }
     // calculo da distancia separado da função de marcadores de paradas próximas.
     private double distancia(double latiAtual, double longiAtual, double latiParada, double longiParada){
@@ -433,23 +439,33 @@ public class MapsActivity extends AppCompatActivity
 
     //metodo que compara as linhas do usuario e do destino
     private void listaLinhas(){
-        listaLinhas = new ArrayList<String>();
 
-        for(Integer n : paradaGPS){
-            if(paradaDestino.contains(n)){
-                listaLinhas.add(Integer.toString(n));
+       listaLinhas = new ArrayList<String>();
 
-                ListaLinhas = (ListView) findViewById(R.id.listviewid);
+        for(Integer n : paradaGPS) {
+            if (paradaDestino.contains(n)) {
+                if(!listaLinhas.contains(String.valueOf(n))) {
+                    listaLinhas.add(String.valueOf(n));
+                }
+            }
+        }
+                //Log.i("IDLinha", String.valueOf(n));
 
-                itensAdaptador = new ArrayAdapter<String>(getApplicationContext(),
+        //ListaLinhas = (ListView) findViewById(R.id.listviewid);
+        setContentView(R.layout.activity_lista);
+
+        ListView ListaLinhas =  (ListView) findViewById(R.id.listviewid);
+
+
+                itensAdaptador1 = new ArrayAdapter<String>(getApplicationContext(),
                         android.R.layout.simple_list_item_1,
                         android.R.id.text1,
                         listaLinhas);
+                //ListaLinhas = (ListView) findViewById(R.id.listviewid);
+                ListaLinhas.setAdapter(itensAdaptador1);
 
-                ListaLinhas.setAdapter(itensAdaptador);
-
-//                linhas = new ArrayList<>();
-//                linhas.add("linha");
+                linhas1 = new ArrayList<>();
+                linhas1.add("linha");
 
                 ListaLinhas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -461,33 +477,53 @@ public class MapsActivity extends AppCompatActivity
 
                         Intent i = new Intent(MapsActivity.this, ListaActivity.class);
                         startActivity(i);
+
                     }
                 });
-
-
-            }
-        }
     }
 
 
 
     //carrega nome nos marcadores
 
-    private String marcadores(int idLinha){
-        String nomeLinha = null;
+    private void marcadores(){
+        try {
         bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
-        Cursor cursor1 = bancoDados.rawQuery("SELECT * FROM linhas WHERE idlinha =" + idLinha, null);
-        cursor1.moveToFirst();
 
-        int indiceColunaNome = cursor1.getColumnIndex("nome");
+        Cursor cursor3 = bancoDados.rawQuery("SELECT * FROM linhas", null);
 
-        while (cursor1 != null) {
+        int indiceColunaCodigo1 = cursor3.getColumnIndex("codigo");
+        int indiceColunaNome1 = cursor3.getColumnIndex("nome");
+        int indiceColunaId1 = cursor3.getColumnIndex("idlinha");
 
-            //int indiceColunaCodigo = cursor1.getColumnIndex("codigo");
-            nomeLinha = cursor1.getString(indiceColunaNome);
+        ArrayList<String> codigo1 = new ArrayList<String>();
+        ArrayList<String> nome1 = new ArrayList<String>();
+        ArrayList<String> idlinha1 = new ArrayList<String>();
+        resultado = new ArrayList<String>();
 
+        cursor3.moveToFirst();
+        while (cursor3 != null) {
+
+            codigo1.add(cursor3.getString(indiceColunaCodigo1));
+            nome1.add(cursor3.getString(indiceColunaNome1));
+            idlinha1.add(cursor3.getString(indiceColunaId1));
+            resultado.add(cursor3.getString(indiceColunaCodigo1) + " " + cursor3.getString(indiceColunaNome1)+ " - " + cursor3.getString(indiceColunaId1));
+
+            cursor3.moveToNext();
         }
-        return nomeLinha;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String nomeLinhas(int idLinha){
+        for(String n : resultado){
+            if(resultado.contains(idLinha)){
+                linhaString = n;
+            }
+        }
+        return linhaString;
     }
 
     // carregará o mapa com as paradas carregadas.

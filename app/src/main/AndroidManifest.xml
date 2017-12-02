@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <!-- chama a tela inicial do app -->
         <activity
             android:name=".MainActivity"
@@ -63,6 +64,7 @@
             android:name=".ListaActivity"
             android:label="@string/title_activity_lista"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".teste"></activity>
     </application>
 
 </manifest>
