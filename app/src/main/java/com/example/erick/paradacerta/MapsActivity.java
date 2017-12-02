@@ -145,7 +145,7 @@ public class MapsActivity extends AppCompatActivity
                 String location = etPlace.getText().toString();
 
                 if(location==null || location.equals("")){
-                    Toast.makeText(getBaseContext(), "No Place is entered", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), "Nenhum endereço preenchido", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -158,7 +158,7 @@ public class MapsActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
 
-                String address = "address=" + location;
+                String address = "address="+"Porto Alegre" + location;
 
                 String sensor = "sensor=false";
 
