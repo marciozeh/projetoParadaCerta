@@ -64,7 +64,6 @@
             android:name=".ListaActivity"
             android:label="@string/title_activity_lista"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".teste"></activity>
     </application>
 
 </manifest>
