@@ -10,6 +10,14 @@
     android:layout_weight="1">
 
     <Button
+        android:id="@+id/btn_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/find" />
+
+    <Button
         android:id="@+id/BtnLista"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,20 +37,11 @@
 
     <EditText
         android:id="@+id/et_place"
-        android:layout_width="307dp"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/btn_show"
         android:hint="@string/hint"
         android:inputType="text" />
-
-    <Button
-        android:id="@+id/btn_show"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/find"
-        tools:ignore="ObsoleteLayoutParam" />
 
     <fragment
         android:id="@+id/map"
