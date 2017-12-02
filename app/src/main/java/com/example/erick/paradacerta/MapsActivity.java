@@ -56,8 +56,8 @@ public class MapsActivity extends AppCompatActivity
     private GoogleMap mMap;
     private static CameraPosition mCameraPosition;
 
-    private ArrayList<Integer> paradaGPS;
-    private ArrayList<Integer> paradaDestino;
+    private ArrayList<String> paradaGPS;
+    private ArrayList<String> paradaDestino;
     private ArrayList<String> listaLinhas;
     private ListView ListaLinhas;
     private ArrayAdapter<String> itensAdaptador1;
@@ -202,7 +202,7 @@ public class MapsActivity extends AppCompatActivity
 //         Get the current location of the device and set the position of the map. pega a localização
         getDeviceLocation();
 
-        marcadores();
+        //marcadores();
 
         //mostraLinhas();
 
@@ -321,9 +321,8 @@ public class MapsActivity extends AppCompatActivity
     private void paradasGPS(double latiAtual, double longiAtual) {
 
         try {
-            String nomeLinha = null;
 
-            paradaGPS = new ArrayList<Integer>();
+            paradaGPS = new ArrayList<String>();
 
             bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
 
@@ -333,26 +332,26 @@ public class MapsActivity extends AppCompatActivity
 
                 int indiceColunaLatitude = cursor.getColumnIndex("latitude");
                 int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
+//                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
+                int indiceColunaNome = cursor.getColumnIndex("codigoNome");
 
                 double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                 double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
-
+//                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
+                String nome = (cursor.getString(indiceColunaNome));
 
                 if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 300) {
-                    //printar o nome da linha está com problema, app fica carregando e nunca termina quando tento consultar a tabela do banco que contem a lista de linhas, é necessário atenção aqui.
-                    nomeLinha = nomeLinhas(idLinha);
+
 
                     LatLng parada = new LatLng(latiParada, longiParada);
                     LatLng userLoc = new LatLng(latiAtual,longiAtual);
-                    mMap.addMarker(new MarkerOptions().position(parada).title(Integer.toString(idLinha)));
+                    mMap.addMarker(new MarkerOptions().position(parada).title(nome));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
                     mMap.getUiSettings().setZoomControlsEnabled(true);
                     float zoomnivel = 14.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, zoomnivel));
 
-                    paradaGPS.add(idLinha);
+                    paradaGPS.add(nome);
                 }
 
                 //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
@@ -372,7 +371,7 @@ public class MapsActivity extends AppCompatActivity
         try {
             String nomeLinha = null;
 
-            paradaDestino = new ArrayList<Integer>();
+            paradaDestino = new ArrayList<String>();
 
             bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
 
@@ -382,26 +381,26 @@ public class MapsActivity extends AppCompatActivity
 
                 int indiceColunaLatitude = cursor.getColumnIndex("latitude");
                 int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
+//                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
+                int indiceColunaNome = cursor.getColumnIndex("codigoNome");
 
                 double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                 double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
+//                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
+                String nome = (cursor.getString(indiceColunaNome));
 
 
                 if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 300) {
-                    //printar o nome da linha está com problema, app fica carregando e nunca termina quando tento consultar a tabela do banco que contem a lista de linhas, é necessário atenção aqui.
-                    //nomeLinha = marcadores(idLinha);
-
-                    paradaDestino.add(idLinha);
 
                     LatLng parada = new LatLng(latiParada, longiParada);
                     LatLng userLoc = new LatLng(latiAtual,longiAtual);
-                    mMap.addMarker(new MarkerOptions().position(parada).title(Integer.toString(idLinha)));
+                    mMap.addMarker(new MarkerOptions().position(parada).title(nome));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
                     mMap.getUiSettings().setZoomControlsEnabled(true);
                     float zoomnivel = 14.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, zoomnivel));
+
+                    paradaDestino.add(nome);
                 }
 
                 //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
@@ -442,16 +441,14 @@ public class MapsActivity extends AppCompatActivity
 
        listaLinhas = new ArrayList<String>();
 
-        for(Integer n : paradaGPS) {
+        for(String n : paradaGPS) {
             if (paradaDestino.contains(n)) {
-                if(!listaLinhas.contains(String.valueOf(n))) {
-                    listaLinhas.add(String.valueOf(n));
+                if(!listaLinhas.contains(n)) {
+                    listaLinhas.add(n);
                 }
             }
         }
-                //Log.i("IDLinha", String.valueOf(n));
 
-        //ListaLinhas = (ListView) findViewById(R.id.listviewid);
         setContentView(R.layout.activity_lista);
 
         ListView ListaLinhas =  (ListView) findViewById(R.id.listviewid);
