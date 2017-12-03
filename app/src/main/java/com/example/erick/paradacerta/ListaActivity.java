@@ -35,12 +35,7 @@ public class ListaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_lista);
-        listaLinhas = (ListView) findViewById(R.id.listviewid);
-        carregaLinhas();
-
         BtnCadastro = (Button) findViewById(R.id.BtnCadastro);
 
         BtnCadastro.setOnClickListener(new View.OnClickListener() {
@@ -58,6 +53,21 @@ public class ListaActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        //recebe o parametro do listaactivity e carrega a rota da linha
+        Bundle bundle = getIntent().getExtras();
+        String linhaid = null;
+        linhaid = bundle.getString("idLinha");
+
+        if(linhaid != null){
+            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+            intent.putExtra("idLinha", linhaid);
+            startActivity(intent);
+        }else {
+            listaLinhas = (ListView) findViewById(R.id.listviewid);
+            carregaLinhas();
+        }
+
     }
 
     //Carrega a lista de linhas disponíveis, nela será possível escolher a linha necessária para carregar as paradas a seguir.
@@ -96,7 +106,7 @@ public class ListaActivity extends AppCompatActivity {
                     //Log.i("IDLinha", linhaid);
                     //carregaParadas(idlinha.get(position));
 
-                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), MapsRotaActivity.class);
                     intent.putExtra("idLinha", linhaid);
                     startActivity(intent);
                 }

@@ -193,24 +193,25 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-//         Prompt the user for permission. pede permissao ao usuario
-        getLocationPermission();
-
-//         Turn on the My Location layer and the related control on the map. faz update da localização
-        updateLocationUI();
-
-//         Get the current location of the device and set the position of the map. pega a localização
-        getDeviceLocation();
-
-        //marcadores();
-
-        //mostraLinhas();
-
         //recebe o parametro do listaactivity e carrega a rota da linha
         Bundle bundle = getIntent().getExtras();
-        String idLinha = bundle.getString("idLinha");
+        String idLinha = null;
+        idLinha = bundle.getString("idLinha");
 
-        rotaLinha(idLinha);
+        if(idLinha != null) {
+            rotaLinha(idLinha);
+        }else {
+
+//         Prompt the user for permission. pede permissao ao usuario
+            getLocationPermission();
+
+//         Turn on the My Location layer and the related control on the map. faz update da localização
+            updateLocationUI();
+
+//         Get the current location of the device and set the position of the map. pega a localização
+            getDeviceLocation();
+        }
+
 
     }
 
@@ -342,7 +343,6 @@ public class MapsActivity extends AppCompatActivity
 
                 if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 300) {
 
-
                     LatLng parada = new LatLng(latiParada, longiParada);
                     LatLng userLoc = new LatLng(latiAtual,longiAtual);
                     mMap.addMarker(new MarkerOptions().position(parada).title(nome));
@@ -458,7 +458,7 @@ public class MapsActivity extends AppCompatActivity
                         android.R.layout.simple_list_item_1,
                         android.R.id.text1,
                         listaLinhas);
-                //ListaLinhas = (ListView) findViewById(R.id.listviewid);
+
                 ListaLinhas.setAdapter(itensAdaptador1);
 
                 linhas1 = new ArrayList<>();
@@ -469,10 +469,9 @@ public class MapsActivity extends AppCompatActivity
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         String linhaid = listaLinhas.get(position);
-                        //Log.i("IDLinha", linhaid);
-                        //carregaParadas(idlinha.get(position));
 
                         Intent i = new Intent(MapsActivity.this, ListaActivity.class);
+                        i.putExtra("idLinha", linhaid);
                         startActivity(i);
 
                     }
@@ -480,60 +479,18 @@ public class MapsActivity extends AppCompatActivity
     }
 
 
-
-    //carrega nome nos marcadores
-
-    private void marcadores(){
-        try {
-        bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
-
-        Cursor cursor3 = bancoDados.rawQuery("SELECT * FROM linhas", null);
-
-        int indiceColunaCodigo1 = cursor3.getColumnIndex("codigo");
-        int indiceColunaNome1 = cursor3.getColumnIndex("nome");
-        int indiceColunaId1 = cursor3.getColumnIndex("idlinha");
-
-        ArrayList<String> codigo1 = new ArrayList<String>();
-        ArrayList<String> nome1 = new ArrayList<String>();
-        ArrayList<String> idlinha1 = new ArrayList<String>();
-        resultado = new ArrayList<String>();
-
-        cursor3.moveToFirst();
-        while (cursor3 != null) {
-
-            codigo1.add(cursor3.getString(indiceColunaCodigo1));
-            nome1.add(cursor3.getString(indiceColunaNome1));
-            idlinha1.add(cursor3.getString(indiceColunaId1));
-            resultado.add(cursor3.getString(indiceColunaCodigo1) + " " + cursor3.getString(indiceColunaNome1)+ " - " + cursor3.getString(indiceColunaId1));
-
-            cursor3.moveToNext();
-        }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private String nomeLinhas(int idLinha){
-        for(String n : resultado){
-            if(resultado.contains(idLinha)){
-                linhaString = n;
-            }
-        }
-        return linhaString;
-    }
-
     // carregará o mapa com as paradas carregadas.
     private void rotaLinha(String idLinha) {
         try {
             bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
 
-            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where idlinha =" + idLinha, null);
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where codigoNome like'%"+idLinha+"%'",null);
             cursor.moveToFirst();
 
 
                 int indiceColunaLatitude = cursor.getColumnIndex("latitude");
                 int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+                int indiceColunaNome = cursor.getColumnIndex("codigoNome");
 
                 PolylineOptions lineOptions = null;
 
@@ -543,6 +500,7 @@ public class MapsActivity extends AppCompatActivity
 
                     double latitude = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                     double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+                    String nome = (cursor.getString(indiceColunaNome));
 
                     //printa a rota
                     lineOptions.add(new LatLng(latitude, longitude));
@@ -550,10 +508,10 @@ public class MapsActivity extends AppCompatActivity
                     LatLng parada = new LatLng(latitude, longitude);
 
                     //printa as paradas
-                    //mMap.addMarker(new MarkerOptions().position(parada).title("Parada x"));
+                    mMap.addMarker(new MarkerOptions().position(parada).title(nome));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
                     mMap.getUiSettings().setZoomControlsEnabled(true);
-                    float zoomnivel = 14.0f;
+                    float zoomnivel = 18.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
                 cursor.moveToNext();
             }
