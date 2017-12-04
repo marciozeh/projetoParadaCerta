@@ -1,5 +1,7 @@
 package com.example.erick.paradacerta;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -12,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -64,6 +67,8 @@ public class MapsActivity extends AppCompatActivity
     static ArrayList<String> linhas1;
     ArrayList<String> resultado;
     String linhaString = null;
+    double latitudeUser = 0;
+    double longitudeUser = 0;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -86,7 +91,6 @@ public class MapsActivity extends AppCompatActivity
     //barra e botao de procurar
     Button mBtnFind;
     EditText etPlace;
-
 
     Button BtnLista;
     Button BtnCadastro;
@@ -198,10 +202,6 @@ public class MapsActivity extends AppCompatActivity
         String idLinha = null;
         idLinha = bundle.getString("idLinha");
 
-        if(idLinha != null) {
-            rotaLinha(idLinha);
-        }else {
-
 //         Prompt the user for permission. pede permissao ao usuario
             getLocationPermission();
 
@@ -209,8 +209,7 @@ public class MapsActivity extends AppCompatActivity
             updateLocationUI();
 
 //         Get the current location of the device and set the position of the map. pega a localização
-            getDeviceLocation();
-        }
+            getDeviceLocation(idLinha);
 
 
     }
@@ -218,7 +217,7 @@ public class MapsActivity extends AppCompatActivity
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
-    private void getDeviceLocation() {
+    private void getDeviceLocation(final String idLinha) {
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
@@ -236,9 +235,11 @@ public class MapsActivity extends AppCompatActivity
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), 14.0f));
 
-                            //Log.i(null,"pegando localizacao");
-                            paradasGPS(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-
+                            if(idLinha==null) {
+                                paradasGPS(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                            }else{
+                                pegaPosicao(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), idLinha);
+                                }
 
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -366,13 +367,8 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void paradasDestino(double latiAtual, double longiAtual) {
-
-
-        try {
-            String nomeLinha = null;
-
+            try {
             paradaDestino = new ArrayList<String>();
-
             bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
 
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas", null);
@@ -381,12 +377,11 @@ public class MapsActivity extends AppCompatActivity
 
                 int indiceColunaLatitude = cursor.getColumnIndex("latitude");
                 int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-//                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
+
                 int indiceColunaNome = cursor.getColumnIndex("codigoNome");
 
                 double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                 double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-//                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
                 String nome = (cursor.getString(indiceColunaNome));
 
 
@@ -440,7 +435,6 @@ public class MapsActivity extends AppCompatActivity
     private void listaLinhas(){
 
        listaLinhas = new ArrayList<String>();
-
         for(String n : paradaGPS) {
             if (paradaDestino.contains(n)) {
                 if(!listaLinhas.contains(n)) {
@@ -449,41 +443,110 @@ public class MapsActivity extends AppCompatActivity
             }
         }
 
-        setContentView(R.layout.activity_lista);
 
-        ListView ListaLinhas =  (ListView) findViewById(R.id.listviewid);
+        final Dialog listDialog;
+        listDialog = new Dialog(this);
+        listDialog.setTitle("Select Item");
+        final LayoutInflater li = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = li.inflate(R.layout.activity_lista, null, false);
+        listDialog.setContentView(v);
+        listDialog.setCancelable(true);
+        //there are a lot of settings, for dialog, check them all out!
 
-
-                itensAdaptador1 = new ArrayAdapter<String>(getApplicationContext(),
-                        android.R.layout.simple_list_item_1,
-                        android.R.id.text1,
-                        listaLinhas);
-
-                ListaLinhas.setAdapter(itensAdaptador1);
-
-                linhas1 = new ArrayList<>();
-                linhas1.add("linha");
-
-                ListaLinhas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        ListView list1 = (ListView) listDialog.findViewById(R.id.listviewid);
+        list1.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, listaLinhas));
+        listDialog.show();
+        list1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         String linhaid = listaLinhas.get(position);
-
-                        Intent i = new Intent(MapsActivity.this, ListaActivity.class);
-                        i.putExtra("idLinha", linhaid);
-                        startActivity(i);
-
+                        getDeviceLocation(linhaid);
+                        listDialog.dismiss();
                     }
-                });
+        });
     }
 
 
-    // carregará o mapa com as paradas carregadas.
-    private void rotaLinha(String idLinha) {
+    private void pegaPosicao(double latiAtual, double longiAtual,String idLinha){
+        double lagiU = latiAtual;
+        double logiU = longiAtual;
+        proximaGPS(lagiU,logiU,idLinha);
+    }
+
+    //metodo que acha a parada mais próxima da linha selecionada do usuario
+    private void proximaGPS(double latiAtual, double longiAtual, String idLinha){
+
+        double distanciaMinima = 300;
+        double distanciaMinima2 = 300;
+        double latiProx = 0;
+        double longProx = 0;
+        double latiProxD = 0;
+        double longProxD = 0;
+        String nomelinha = null;
+
         try {
             bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
 
+
+            Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where codigoNome like'%"+idLinha+"%'",null);
+            cursor.moveToFirst();
+
+
+            int indiceColunaLatitude = cursor.getColumnIndex("latitude");
+            int indiceColunaLongitude = cursor.getColumnIndex("longitude");
+            int indiceColunaNome = cursor.getColumnIndex("codigoNome");
+
+            cursor.moveToFirst();
+            while (cursor != null) {
+
+                double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
+                double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
+                String nome = (cursor.getString(indiceColunaNome));
+
+                if (distancia(latiAtual, longiAtual, latiParada, longiParada) < distanciaMinima) {
+                    latiProx = latiParada;
+                    longProx = longiParada;
+                    nomelinha = nome;
+                    distanciaMinima = distancia(latiAtual, longiAtual, latiParada, longiParada);
+                }
+
+                if (distancia(latitudeUser, longitudeUser, latiParada, longiParada) < distanciaMinima2) {
+                    latiProxD = latiParada;
+                    longProxD = longiParada;
+                    nomelinha = nome;
+                    distanciaMinima2 = distancia(latitudeUser, longitudeUser, latiParada, longiParada);
+                }
+
+                cursor.moveToNext();
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        rotaLinha(latiProx, longProx, latiProxD, longProxD, nomelinha);
+    }
+
+
+    private void printaParada(Double lati, double longi, String nome){
+
+
+
+        LatLng parada = new LatLng(lati, longi);
+
+        //printa a parada mais próxima, para teste.
+        mMap.addMarker(new MarkerOptions().position(parada).title(nome));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        float zoomnivel = 14.0f;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
+    }
+    // carregará o mapa com as paradas carregadas.
+    private void rotaLinha(double lati, double longi, double latiD, double longiD, String idLinha) {
+        int flag = 0;
+        int flag1 = 0;
+        try {
+            bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where codigoNome like'%"+idLinha+"%'",null);
             cursor.moveToFirst();
 
@@ -502,6 +565,22 @@ public class MapsActivity extends AppCompatActivity
                     double longitude = Double.parseDouble(cursor.getString(indiceColunaLongitude));
                     String nome = (cursor.getString(indiceColunaNome));
 
+
+                    if ((latiD == latitude && longiD == longitude) && flag ==1 ){
+                        flag = 0;
+                    }
+                    if ((latiD == latitude && longiD == longitude) && flag ==0 ){
+                        flag = 1;
+                    }
+                    if ((lati == latitude && longi == longitude) && flag ==1 ){
+                        flag = 0;
+                    }
+                    if ((lati == latitude && longi == longitude) && flag ==1 ){
+                        flag = 1;
+                    }
+
+                    if (flag == 1){
+
                     //printa a rota
                     lineOptions.add(new LatLng(latitude, longitude));
                     Polyline polyline1 = mMap.addPolyline(lineOptions);
@@ -511,9 +590,13 @@ public class MapsActivity extends AppCompatActivity
                     mMap.addMarker(new MarkerOptions().position(parada).title(nome));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
                     mMap.getUiSettings().setZoomControlsEnabled(true);
-                    float zoomnivel = 18.0f;
+                    float zoomnivel = 14.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
+                        }
+
+
                 cursor.moveToNext();
+
             }
 
         } catch (Exception e) {
@@ -650,6 +733,8 @@ public class MapsActivity extends AppCompatActivity
 
                 //mostrando paradas proximas ao endereco pedido
                 paradasDestino(lat, lng);
+                latitudeUser = lat;
+                longitudeUser = lng;
 
                 // Locate the first location
                 if(i==0)
