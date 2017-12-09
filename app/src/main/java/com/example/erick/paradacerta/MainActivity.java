@@ -41,7 +41,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     public static final int SIGN_IN_CODE = 777;
 
+    public void entrarMapa(View view){
 
+        if (view.getId() == R.id.bntMapa)
+            startActivity(new Intent(this, MapsActivity.class));
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
