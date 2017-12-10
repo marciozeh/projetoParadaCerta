@@ -6,13 +6,48 @@
     android:layout_height="match_parent"
     tools:context="com.example.erick.paradacerta.ListaActivity">
 
+    <EditText
+        android:id="@+id/et_place"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginLeft="8dp"
+
+        android:layout_marginRight="8dp"
+        android:hint="Linha"
+        android:inputType="text"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/btn_show"
+        tools:layout_editor_absoluteY="0dp"
+        tools:ignore="MissingConstraints"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <Button
+        android:id="@+id/btn_show"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="280dp"
+        android:layout_marginRight="8dp"
+        android:orientation="horizontal"
+        android:text="Buscar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_editor_absoluteY="0dp"
+        tools:text="Buscar"
+        tools:ignore="HardcodedText,MissingConstraints,RtlHardcoded"
+        android:layout_marginStart="280dp"
+        android:layout_marginEnd="8dp" />
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:text="Linhas"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
@@ -22,40 +57,54 @@
 
     <ListView
         android:id="@+id/listviewid"
-        android:layout_width="335dp"
-        android:layout_height="429dp"
-        android:layout_marginTop="66dp"
+        android:layout_width="334dp"
+        android:layout_height="415dp"
+        android:layout_marginTop="114dp"
         android:background="@color/cardview_shadow_start_color"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.FitWindowsLinearLayout
-        android:layout_width="0dp"
-        android:layout_height="551dp"
-        tools:layout_editor_absoluteX="25dp"
-        tools:layout_editor_absoluteY="8dp"
-        tools:ignore="MissingConstraints">
+    <Button
+        android:id="@+id/BtnCadastro"
+        android:text="@string/BtnCadastro"
+        tools:text="@string/BtnCadastro"
+        android:layout_width="170dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentTop="false"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="22dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.079"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        android:layout_marginEnd="16dp"
+        />
 
-        <Button
-            android:id="@+id/BtnMaps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/BtnMaps"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="-156dp"
-            tools:layout_editor_absoluteY="481dp"
-            tools:text="Maps" />
-
-        <Button
-            android:id="@+id/BtnCadastro"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/BtnCadastro"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="503dp"
-            tools:text="@string/BtnCadastro" />
-    </android.support.v7.widget.FitWindowsLinearLayout>
+    <Button
+        android:id="@+id/BtnMaps"
+        android:layout_below="@+id/btn_show"
+        android:text="@string/BtnMaps"
+        android:layout_width="170dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentTop="false"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="22dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/BtnCadastro"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.079"
+        app:layout_constraintHorizontal_bias="0.4"
+        tools:ignore="RtlHardcoded"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="8dp"
+        tools:text="Maps" />
 
 </android.support.constraint.ConstraintLayout>
