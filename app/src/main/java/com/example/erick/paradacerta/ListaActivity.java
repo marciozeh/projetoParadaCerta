@@ -9,8 +9,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
@@ -31,6 +35,9 @@ public class ListaActivity extends AppCompatActivity {
 
     SQLiteDatabase bancoDados;
 
+
+    Button mBtnFind;
+    EditText etPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,57 @@ public class ListaActivity extends AppCompatActivity {
             listaLinhas = (ListView) findViewById(R.id.listviewid);
             carregaLinhas();
         }
+
+        // Getting reference to the find button
+        mBtnFind = (Button) findViewById(R.id.btn_show);
+
+        // Getting reference to EditText
+        etPlace = (EditText) findViewById(R.id.et_place);
+
+//         Setting click event listener for the find button
+        mBtnFind.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // Getting the place entered
+
+                try {
+                String location = etPlace.getText().toString();
+
+                if(location==null || location.equals("")){
+                    Toast.makeText(getBaseContext(), "Nenhum endereço preenchido", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
+
+                Cursor cursor = bancoDados.rawQuery("SELECT distinct codigoNome FROM coordenadas where codigoNome like '%" + location +"%'", null);
+
+                int indiceColunaNome = cursor.getColumnIndex("codigoNome");
+
+                resultado = new ArrayList<String>();
+
+                itensAdaptador = new ArrayAdapter<String>(getApplicationContext(),
+                        android.R.layout.simple_list_item_1,
+                        android.R.id.text1,
+                        resultado);
+
+                listaLinhas = (ListView) findViewById(R.id.listviewid);
+                listaLinhas.setAdapter(itensAdaptador);
+
+                cursor.moveToNext();
+                while (cursor != null) {
+
+                    resultado.add(cursor.getString(indiceColunaNome));
+
+                    //Log.i("LogX","Código: " + cursor.getString(indiceColunaCodigo) + " Linha: " +cursor.getString(indiceColunaNome));
+                    cursor.moveToNext();
+                }
+                } catch (Exception e) {
+                e.printStackTrace();
+            }
+            }
+        });
 
     }
 
