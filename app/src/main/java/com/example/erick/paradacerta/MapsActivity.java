@@ -62,11 +62,6 @@ public class MapsActivity extends AppCompatActivity
     private ArrayList<String> paradaGPS;
     private ArrayList<String> paradaDestino;
     private ArrayList<String> listaLinhas;
-    private ListView ListaLinhas;
-    private ArrayAdapter<String> itensAdaptador1;
-    static ArrayList<String> linhas1;
-    ArrayList<String> resultado;
-    String linhaString = null;
     double latitudeUser = 0;
     double longitudeUser = 0;
 
@@ -211,7 +206,6 @@ public class MapsActivity extends AppCompatActivity
 //         Get the current location of the device and set the position of the map. pega a localização
         getDeviceLocation(idLinha);
 
-
     }
 
     /**
@@ -256,7 +250,6 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-
     /**
      * Prompts the user for permission to use the device location.
      */
@@ -276,7 +269,6 @@ public class MapsActivity extends AppCompatActivity
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
-
     /**
      * Handles the result of the request for location permissions.
      */
@@ -296,7 +288,6 @@ public class MapsActivity extends AppCompatActivity
         }
         updateLocationUI();
     }
-
 
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
@@ -334,12 +325,10 @@ public class MapsActivity extends AppCompatActivity
 
                 int indiceColunaLatitude = cursor.getColumnIndex("latitude");
                 int indiceColunaLongitude = cursor.getColumnIndex("longitude");
-//                int indiceColunaIdLinha = cursor.getColumnIndex("idlinha");
                 int indiceColunaNome = cursor.getColumnIndex("codigoNome");
 
                 double latiParada = Double.parseDouble(cursor.getString(indiceColunaLatitude));
                 double longiParada = Double.parseDouble(cursor.getString(indiceColunaLongitude));
-//                int idLinha = Integer.parseInt(cursor.getString(indiceColunaIdLinha));
                 String nome = (cursor.getString(indiceColunaNome));
 
                 if(distancia(latiAtual,longiAtual, latiParada, longiParada) <= 500) {
@@ -355,7 +344,6 @@ public class MapsActivity extends AppCompatActivity
                     paradaGPS.add(nome);
                 }
 
-                //Log.i("LogX", "latitude: " + cursor.getString(indiceColunaLatitude) + " longitude: " + cursor.getString(indiceColunaLongitude));
                 cursor.moveToNext();
             }
             //botoes de zoom'
@@ -544,7 +532,7 @@ public class MapsActivity extends AppCompatActivity
     // carregará o mapa com as paradas carregadas.
     private void rotaLinha(double lati, double longi, double latiD, double longiD, String idLinha) {
         int flag = 0;
-        int flag1 = 0;
+
         try {
             bancoDados = openOrCreateDatabase("appbanco.sqlite", MODE_PRIVATE, null);
             Cursor cursor = bancoDados.rawQuery("SELECT * FROM coordenadas where codigoNome like'%"+idLinha+"%'",null);
@@ -566,14 +554,7 @@ public class MapsActivity extends AppCompatActivity
                 String nome = (cursor.getString(indiceColunaNome));
 
                 //começa a printar a rota
-                if ((latiD == latitude && longiD == longitude) && flag ==0 ){
-                    flag = 1;
-                }
-                if ((lati == latitude && longi == longitude) && flag ==0 ){
-                    flag = 1;
-                }
-
-                if (flag == 1){
+                if (((latiD == latitude && longiD == longitude) && flag ==0) || ((lati == latitude && longi == longitude) && flag ==0 ) || flag == 1){
 
                     //printa a rota
                     lineOptions.add(new LatLng(latitude, longitude));
@@ -581,22 +562,23 @@ public class MapsActivity extends AppCompatActivity
                     LatLng parada = new LatLng(latitude, longitude);
 
                     //printa as paradas
-                    mMap.addMarker(new MarkerOptions().position(parada).title(nome));
+                    //mMap.addMarker(new MarkerOptions().position(parada).title(nome));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(parada));
                     mMap.getUiSettings().setZoomControlsEnabled(true);
                     float zoomnivel = 14.0f;
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(parada, zoomnivel));
-                }
-                //para de printar a rota.
-                if ((lati == latitude && longi == longitude) && flag ==1 ){
-                    flag = 0;
-                }
-                if ((latiD == latitude && longiD == longitude) && flag ==1 ){
-                    flag = 0;
-                }
 
-                cursor.moveToNext();
-
+                    //para de printar a rota.
+                    if (((lati == latitude && longi == longitude) && flag ==1) || ((latiD == latitude && longiD == longitude) && flag ==1)){
+                        flag = 0;
+                        cursor.moveToNext();
+                    }else {
+                        flag = 1;
+                        cursor.moveToNext();
+                    }
+                }else{
+                    cursor.moveToNext();
+                }
             }
 
         } catch (Exception e) {

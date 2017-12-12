@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,9 +15,7 @@
         android:id="@+id/et_place"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-
         android:layout_marginLeft="8dp"
-
         android:layout_marginRight="8dp"
         android:hint="@string/hint"
         android:inputType="text"
@@ -24,9 +23,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/btn_show"
         tools:layout_editor_absoluteY="0dp"
-        tools:ignore="MissingConstraints"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        android:layout_marginEnd="8dp"
+        tools:ignore="MissingConstraints"/>
 
     <Button
         android:id="@+id/btn_show"
@@ -42,9 +41,9 @@
         app:layout_constraintRight_toRightOf="parent"
         tools:layout_editor_absoluteY="0dp"
         tools:text="Buscar"
-        tools:ignore="HardcodedText,MissingConstraints,RtlHardcoded"
         android:layout_marginStart="280dp"
-        android:layout_marginEnd="8dp" />
+        android:layout_marginEnd="8dp"
+        tools:ignore="HardcodedText,MissingConstraints,RtlHardcoded"/>
 
     <Button
         android:id="@+id/BtnCadastro"
@@ -61,8 +60,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.079"
         tools:text="Perfil"
-        tools:ignore="HardcodedText,RtlHardcoded"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginEnd="16dp"
+        tools:ignore="HardcodedText,RtlHardcoded"/>
 
     <Button
         android:id="@+id/BtnLista"
@@ -82,9 +81,9 @@
         app:layout_constraintVertical_bias="0.079"
         tools:text="Lista"
         app:layout_constraintHorizontal_bias="0.6"
-        tools:ignore="RtlHardcoded"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="8dp" />
+        android:layout_marginEnd="8dp"
+        tools:ignore="RtlHardcoded"/>
 
     <fragment
         android:id="@+id/map"
@@ -100,30 +99,5 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:context="com.example.erick.paradacerta.MapsActivity"
-        android:layout_marginStart="8dp" />
+        android:layout_marginStart="8dp"/>
 </android.support.constraint.ConstraintLayout>
-
-    <!--</android.support.v4.widget.DrawerLayout>-->
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-    <!--<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:id="@+id/drawer_layout"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:fitsSystemWindows="true"-->
-    <!--tools:openDrawer="start">-->
-
-    <!--<include-->
-    <!--layout="@layout/app_bar_maps"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" />-->
-
-    <!--<android.support.design.widget.NavigationView-->
-    <!--android:id="@+id/nav_view"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_gravity="start"-->
-    <!--android:fitsSystemWindows="true"-->
-    <!--app:headerLayout="@layout/nav_header_maps"-->
-    <!--app:menu="@menu/activity_maps_drawer" />-->
