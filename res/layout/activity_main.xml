@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/com_facebook_button_background_color_focused"
+    tools:context="com.example.erick.paradacerta.MainActivity"
+    android:weightSum="1">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="165dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo_certo2" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/btnLogin"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="30dp"
+        android:elevation="@dimen/activity_vertical_margin" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/signInButton"
+        android:layout_width="200dp"
+        android:layout_height="35dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp" />
+
+
+    <Button
+        android:id="@+id/btnMapa"
+        style="@android:style/Widget.DeviceDefault.Light.Button"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+
+        android:elevation="@dimen/activity_vertical_margin"
+        android:onClick="entrarMapa"
+        android:text="Entrar" />
+
+    <Button
+        android:id="@+id/btnMenu"
+        android:layout_width="50dp"
+        android:layout_height="47dp"
+        android:background="@drawable/ic_menu_2"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="0dp"
+        android:onClick="opcaoMenu"/>
+
+</LinearLayout>
