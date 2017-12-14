@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
@@ -120,6 +121,14 @@ public class ListaActivity extends AppCompatActivity {
                     //Log.i("LogX","Código: " + cursor.getString(indiceColunaCodigo) + " Linha: " +cursor.getString(indiceColunaNome));
                     cursor.moveToNext();
                 }
+                listaLinhas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapter, View view, int position, long id){
+                        Intent intent = new Intent(ListaActivity.this, HistoricoActivity.class);
+                        intent.putExtra("id",id);
+                        startActivity(intent);
+                    }
+                });
                 } catch (Exception e) {
                 e.printStackTrace();
             }
